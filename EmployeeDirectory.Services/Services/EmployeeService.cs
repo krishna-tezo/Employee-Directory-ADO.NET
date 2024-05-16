@@ -1,4 +1,5 @@
-﻿using EmployeeDirectory.DATA;
+﻿using EmployeeDirectory.Data.Data.Services;
+using EmployeeDirectory.DATA;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
 namespace EmployeeDirectory.Services
@@ -9,9 +10,13 @@ namespace EmployeeDirectory.Services
 
         
         private IJsonDataHandler jsonDataHandler;
-        public EmployeeService(IJsonDataHandler jsonDataHandler)
+        private IEmployeeDataService employeeDataService;
+        
+        public EmployeeService(IJsonDataHandler jsonDataHandler,IEmployeeDataService employeeDataService, IProjectDataService projectDataService)
         {
             this.jsonDataHandler = jsonDataHandler;
+            this.employeeDataService = employeeDataService;
+           
         }
         public string GenerateNewId(string firstName, string lastName)
         {
@@ -69,10 +74,10 @@ namespace EmployeeDirectory.Services
         public List<Employee> GetEmployees()
         {
             List<Employee> employees = [];
-
             try
             {
-                employees = jsonDataHandler.GetDataFromJson<Employee>();
+                //employees = jsonDataHandler.GetDataFromJson<Employee>();
+                employees = employeeDataService.GetEmployees();
             }
             catch(Exception ex)
             {

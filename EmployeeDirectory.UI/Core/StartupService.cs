@@ -8,6 +8,8 @@ using EmployeeDirectory.Controllers;
 using EmployeeDirectory.DATA;
 using EmployeeDirectory.UI.Interfaces;
 using EmployeeDirectory.UI.Controllers;
+using EmployeeDirectory.Data.Data.Services;
+using EmployeeDirectory.Services.Services;
 
 namespace EmployeeDirectory.Core
 {
@@ -23,8 +25,12 @@ namespace EmployeeDirectory.Core
         public ServiceProvider Configure()
         {
             services.AddSingleton<IJsonDataHandler, JsonDataHandler>();
+            services.AddSingleton<IEmployeeDataService, EmployeeDataService>();
+            services.AddSingleton<IRoleDataService, RoleDataService>();
+            services.AddSingleton<IProjectDataService, ProjectDataService>();
             services.AddSingleton<IEmployeeService, EmployeeService>();
             services.AddSingleton<IRoleService, RoleService>();
+            services.AddSingleton<IProjectService, ProjectService>();
             services.AddSingleton<IUIService, UIService>();
             services.AddSingleton<IEmployeeMenu, EmployeeMenu>();
             services.AddSingleton<IRoleMenu, RoleMenu>();

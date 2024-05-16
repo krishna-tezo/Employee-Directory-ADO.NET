@@ -6,14 +6,13 @@
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Email { get; set; }
-        public DateTime Dob { get; set; }
+        public DateTime DOB { get; set; }
         public string? MobileNumber { get; set; }
-        public string? ManagerName { get; set; }
-        public string? ProjectName { get; set; }
         public DateTime JoinDate { get; set; }
-        public bool IsDeleted {get; set;}   
+        public string? ProjectId {  get; set; }
+ 
         public string? RoleId { get; set; }
-
+        public bool IsDeleted { get; set; }
 
         public override string ToString()
         {

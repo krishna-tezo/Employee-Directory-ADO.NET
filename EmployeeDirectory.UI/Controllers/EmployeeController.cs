@@ -3,6 +3,8 @@ using EmployeeDirectory.Models;
 using EmployeeDirectory.ViewModel;
 using EmployeeDirectory.Interfaces;
 using AutoMapper;
+using EmployeeDirectory.Data.Data.Services;
+using EmployeeDirectory.Models.Models;
 using System.Data;
 namespace EmployeeDirectory.UI.Controllers
 {
@@ -10,11 +12,13 @@ namespace EmployeeDirectory.UI.Controllers
     {
         IEmployeeService employeeService;
         IRoleService roleService;
+        IProjectDataService projectDataService;
 
-        public EmployeeController(IEmployeeService employeeService, IRoleService roleService)
+        public EmployeeController(IEmployeeService employeeService, IRoleService roleService,IProjectDataService projectDataService)
         {
             this.employeeService = employeeService;
             this.roleService = roleService;
+            this.projectDataService = projectDataService;
         }
 
         public string GetNewEmployeeId(string firstName, string lastName)
@@ -33,22 +37,46 @@ namespace EmployeeDirectory.UI.Controllers
                 .ForMember(dest => dest.Role, act => act.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Id, act => act.Ignore())
                 .ForMember(dest => dest.Name, act => act.Ignore());
+
+                cfg.CreateMap<Project, EmployeeView>()
+                .ForMember(dest => dest.ProjectName, act => act.MapFrom(src => src.Name))
+                .ForMember(dest => dest.ManagerName, act => act.MapFrom(src => src.ManagerName))
+                .ForMember(dest => dest.Id, act => act.Ignore());
             });
-           
+
             return new Mapper(config);
         }
+
+
         public List<EmployeeView> ViewEmployees()
         {
 
             Mapper mapper = GetEmployeeViewMapper();
             List<Employee> employees = employeeService.GetEmployees();
             List<Role> roles = roleService.GetAllRoles();
+            List<Project> projects = projectDataService.GetProjects();
 
-            List<EmployeeView> employeesToView = employees.Join(roles, emp => emp.RoleId, role => role.Id, (employee, role) =>
+            //List<EmployeeView> employeesToView = employees.Join(roles, emp => emp.RoleId, role => role.Id, (employee, role) =>
+            //{
+            //    EmployeeView employeeToView = mapper.Map<Employee, EmployeeView>(employee);
+            //    employeeToView = mapper.Map(role, employeeToView);
+            //    return employeeToView;
+            //}).ToList();
+
+
+
+            List<EmployeeView> employeesToView = employees
+            .Join(roles, emp => emp.RoleId, role => role.Id, (emp, role) => new { Employee = emp, Role = role })
+            .Join(projects, empRole => empRole.Employee.ProjectId, project => project.Id, (empRole, project) => new EmployeeView
             {
-                EmployeeView employeeToView = mapper.Map<Employee, EmployeeView>(employee);
-                employeeToView = mapper.Map(role,employeeToView);
-                return employeeToView;
+                Id = empRole.Employee.Id,
+                Name = $"{empRole.Employee.FirstName} {empRole.Employee.LastName}",
+                Role = empRole.Role.Name,
+                Department = empRole.Role.Department,
+                Location = empRole.Role.Location,
+                JoinDate = empRole.Employee.JoinDate,
+                ManagerName = project.ManagerName,
+                ProjectName = project.Name
             }).ToList();
             return employeesToView;
         }

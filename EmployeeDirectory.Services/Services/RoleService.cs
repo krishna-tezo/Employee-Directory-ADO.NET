@@ -1,4 +1,5 @@
-﻿using EmployeeDirectory.DATA;
+﻿using EmployeeDirectory.Data.Data.Services;
+using EmployeeDirectory.DATA;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
 using System.Data;
@@ -9,9 +10,12 @@ namespace EmployeeDirectory.Services
     {
 
         private IJsonDataHandler jsonDataHandler;
-        public RoleService(IJsonDataHandler jsonDataHandler)
+        private IRoleDataService roleDataService;
+       
+        public RoleService(IJsonDataHandler jsonDataHandler, IRoleDataService roleDataService)
         {
             this.jsonDataHandler = jsonDataHandler;
+            this.roleDataService = roleDataService;
         }
         public Role AddRole(Role role)
         {
@@ -23,7 +27,7 @@ namespace EmployeeDirectory.Services
 
         public List<Role> GetAllRoles()
         {
-            List<Role> roles = jsonDataHandler.GetDataFromJson<Role>();
+            List<Role> roles = roleDataService.GetRoles();
             return roles;
         }
 

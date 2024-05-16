@@ -255,8 +255,6 @@ namespace EmployeeDirectory.UI.UIServices
             employee.LastName = lastName;
             employee.Email = email;
             employee.JoinDate = joinDate;
-            employee.ManagerName = managerName;
-            employee.ProjectName = projectName;
             employee.IsDeleted = false;
 
             string roleId = roleController.GetRoleId(roleName, location);
