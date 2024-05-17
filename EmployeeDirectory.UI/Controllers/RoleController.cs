@@ -25,6 +25,10 @@ namespace EmployeeDirectory.Controllers
         {
             return roleService.GenerateRoleId(roleName, location);
         }
+        public List<Tuple<string, string>> GetRoleNames()
+        {
+            return roleService.GetRoleNames();
+        }
 
         public List<string> GetAllDepartments()
         {
@@ -42,8 +46,5 @@ namespace EmployeeDirectory.Controllers
 
             return roleService.GetAllLocationByDepartmentAndRoleNames(roleName);
         }
-
-
-
     }
 }

@@ -60,8 +60,8 @@ namespace EmployeeDirectory.Data.Data.Services
                 cmd.CommandType = CommandType.Text;
                 cmd.CommandText = "SELECT* FROM EMPLOYEE WHERE ID = "+id;
                 cmd.Connection.Open();
+                
                 SqlDataReader reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-
                 if (reader.Read())
                 {
                     DateTime dob = DateTime.ParseExact(reader.GetSqlValue(reader.GetOrdinal("DOB")).ToString(), "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
@@ -85,6 +85,8 @@ namespace EmployeeDirectory.Data.Data.Services
                         IsDeleted = isDeleted
                     };
                 }
+
+                
             }
             catch (Exception ex)
             {
@@ -93,5 +95,81 @@ namespace EmployeeDirectory.Data.Data.Services
             return employee;
         }
 
+        public void AddEmployee(Employee employee)
+        {
+            try
+            {
+                SqlConnection connection = ConnectionHandler.GetConnection();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = connection;
+                
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = "INSERT INTO Employee VALUES (@Id, @FirstName, @LastName, @Email, @DOB, @MobileNumber, @JoinDate, @ProjectId, @RoleId, @IsDeleted)";
+                cmd.Parameters.AddWithValue("@Id",employee.Id);
+                cmd.Parameters.AddWithValue("@FirstName",employee.FirstName);
+                cmd.Parameters.AddWithValue("@LastName",employee.LastName);
+                cmd.Parameters.AddWithValue("@Email",employee.Email);
+                cmd.Parameters.AddWithValue("@DOB",employee.DOB);
+                cmd.Parameters.AddWithValue("@MobileNumber",employee.MobileNumber);
+                cmd.Parameters.AddWithValue("@JoinDate",employee.JoinDate);
+                cmd.Parameters.AddWithValue("@ProjectId",employee.ProjectId);
+                cmd.Parameters.AddWithValue("@RoleId",employee.RoleId);
+
+                cmd.Parameters.AddWithValue("@IsDeleted",employee.IsDeleted);
+
+                connection.Open();
+                int n = cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public int UpdateEmployee(Employee employee)
+        {
+            int rowsAffected = -1;
+            try
+            {
+                SqlConnection connection = ConnectionHandler.GetConnection();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = connection;
+
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText =
+                    "UPDATE Employee SET " +
+                    "FirstName = @FirstName, " +
+                    "LastName = @LastName, " +
+                    "Email = @Email, "+
+                    "DOB = @DOB, " +
+                    "MobileNumber = @MobileNumber, " +
+                    "JoinDate = @JoinDate, " +
+                    "ProjectId = @ProjectId, " +
+                    "RoleId = @RoleId, " +
+                    "IsDeleted = @IsDeleted " +
+                    "WHERE Id = @Id";
+
+                cmd.Parameters.AddWithValue("@Id", employee.Id);
+                cmd.Parameters.AddWithValue("@FirstName", employee.FirstName);
+                cmd.Parameters.AddWithValue("@LastName", employee.LastName);
+                cmd.Parameters.AddWithValue("@Email", employee.Email);
+                cmd.Parameters.AddWithValue("@DOB", employee.DOB);
+                cmd.Parameters.AddWithValue("@MobileNumber", employee.MobileNumber);
+                cmd.Parameters.AddWithValue("@JoinDate", employee.JoinDate);
+                cmd.Parameters.AddWithValue("@ProjectId", employee.ProjectId);
+                cmd.Parameters.AddWithValue("@RoleId", employee.RoleId);
+                cmd.Parameters.AddWithValue("@IsDeleted", employee.IsDeleted);
+
+                connection.Open();
+                rowsAffected = cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return rowsAffected;
+        }
     }
 }

@@ -33,8 +33,8 @@ namespace EmployeeDirectory.Services
 
         public Role? GetRoleById(string id)
         {
-            List<Role> roles = GetAllRoles();
-            Role? role = roles.Find((role)=> role.Id == id);
+
+            Role? role = roleDataService.GetRoleById(id);
             if (role == null)
             {
                 return null;
@@ -45,6 +45,17 @@ namespace EmployeeDirectory.Services
         public string GenerateRoleId(string roleName, string location)
         {
             return roleName[..3] + location[..3];
+        }
+        
+        public List<Tuple<string, string>> GetRoleNames()
+        {
+            List<Role> roles = GetAllRoles();
+            List<Tuple<string, string>> roleDetails = roles.Select(role => new { role.Id, role.Name})
+                                                    .AsEnumerable()
+                                                    .Select(role => new Tuple<string, string>(role.Id, role.Name)).ToList();
+
+            return roleDetails;
+            
         }
 
         public List<string> GetAllDepartments()

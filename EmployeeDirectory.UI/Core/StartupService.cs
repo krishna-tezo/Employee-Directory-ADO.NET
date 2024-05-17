@@ -37,6 +37,7 @@ namespace EmployeeDirectory.Core
             services.AddSingleton<IValidator, Validator>();
             services.AddSingleton<IEmployeeController, EmployeeController>();
             services.AddSingleton<IRoleController, RoleController>();
+            services.AddSingleton<IProjectController, ProjectController>();
             services.AddSingleton<MainMenu>();
 
             return services.BuildServiceProvider();

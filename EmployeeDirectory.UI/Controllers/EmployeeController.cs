@@ -3,22 +3,20 @@ using EmployeeDirectory.Models;
 using EmployeeDirectory.ViewModel;
 using EmployeeDirectory.Interfaces;
 using AutoMapper;
-using EmployeeDirectory.Data.Data.Services;
 using EmployeeDirectory.Models.Models;
-using System.Data;
+using EmployeeDirectory.Services.Services;
 namespace EmployeeDirectory.UI.Controllers
 {
     public class EmployeeController : IEmployeeController
     {
         IEmployeeService employeeService;
         IRoleService roleService;
-        IProjectDataService projectDataService;
-
-        public EmployeeController(IEmployeeService employeeService, IRoleService roleService,IProjectDataService projectDataService)
+        IProjectService projectService;
+        public EmployeeController(IEmployeeService employeeService, IRoleService roleService,IProjectService projectService)
         {
             this.employeeService = employeeService;
             this.roleService = roleService;
-            this.projectDataService = projectDataService;
+            this.projectService = projectService;
         }
 
         public string GetNewEmployeeId(string firstName, string lastName)
@@ -54,7 +52,7 @@ namespace EmployeeDirectory.UI.Controllers
             Mapper mapper = GetEmployeeViewMapper();
             List<Employee> employees = employeeService.GetEmployees();
             List<Role> roles = roleService.GetAllRoles();
-            List<Project> projects = projectDataService.GetProjects();
+            List<Project> projects = projectService.GetProjects();
 
             //List<EmployeeView> employeesToView = employees.Join(roles, emp => emp.RoleId, role => role.Id, (employee, role) =>
             //{
@@ -86,6 +84,7 @@ namespace EmployeeDirectory.UI.Controllers
             Mapper mapper = GetEmployeeViewMapper();
 
             Employee? employee = employeeService.GetEmployeeById(empId);
+            Project? project = projectService.GetProjectById(employee.ProjectId);
 
             EmployeeView? employeeToView = new EmployeeView();
             if (employee == null)
@@ -93,7 +92,8 @@ namespace EmployeeDirectory.UI.Controllers
                 return null;
             }
             else
-            {
+            {   
+
                 Role role = roleService.GetRoleById(employee.RoleId!);
                 if (role == null)
                 {
@@ -101,12 +101,22 @@ namespace EmployeeDirectory.UI.Controllers
                 }
                 else
                 {
-                    employeeToView = mapper.Map<Employee, EmployeeView>(employee);
-                    employeeToView = mapper.Map(role, employeeToView);
+                    //employeeToView = mapper.Map<Employee, EmployeeView>(employee);
+                    //employeeToView = mapper.Map(role, employeeToView);
+                    employeeToView = new EmployeeView
+                    {
+                        Id = employee.Id,
+                        Name = employee.FirstName + " " + employee.LastName,
+                        Role = role.Name,
+                        Department = role.Department,
+                        Location = role.Location,
+                        JoinDate = employee.JoinDate,
+                        ManagerName = project.ManagerName,
+                        ProjectName = project.Name
+                    };
                 }
             }
             return employeeToView;
-            
         }
 
         public Employee? GetEmployeeById(string id)
@@ -119,7 +129,7 @@ namespace EmployeeDirectory.UI.Controllers
             return employeeService.AddEmployee(employee);
         }
 
-        public Employee? EditEmployee(Employee employee)
+        public int EditEmployee(Employee employee)
         {
             return employeeService.UpdateEmployee(employee);
         }

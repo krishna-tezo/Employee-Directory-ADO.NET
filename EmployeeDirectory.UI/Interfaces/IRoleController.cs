@@ -8,6 +8,7 @@ namespace EmployeeDirectory.Interfaces
         List<string> GetAllDepartments();
         List<string> GetAllLocationByDepartmentAndRoleNames(string roleName);
         List<string> GetAllRoleNamesByDepartment(string department);
+        List<Tuple<string,string>> GetRoleNames();
         string GetRoleId(string roleName, string location);
         List<Role> ViewRoles();
     }

@@ -1,5 +1,4 @@
 ﻿using EmployeeDirectory.Data.Data.Services;
-using EmployeeDirectory.DATA;
 using EmployeeDirectory.Models;
 using EmployeeDirectory.Models.Models;
 
@@ -26,6 +25,22 @@ namespace EmployeeDirectory.Services.Services
                 Console.WriteLine(ex.StackTrace);
             }
             return projects;
+        }
+        public Project GetProjectById(string id)
+        {
+            Project project = projectDataService.GetProjectById(id);
+            return project;
+        }
+
+        public List<Tuple<string, string,string>> GetProjectNames()
+        {
+            List<Project> projects = GetProjects();
+            List<Tuple<string, string,string>> projectDetails = projects.Select(project => new { project.Id, project.Name, project.ManagerName })
+                                                    .AsEnumerable()
+                                                    .Select(project => new Tuple<string, string,string>(project.Id, project.Name,project.ManagerName)).ToList();
+
+            return projectDetails;
+
         }
     }
 }

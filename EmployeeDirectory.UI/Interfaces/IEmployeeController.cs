@@ -8,7 +8,7 @@ namespace EmployeeDirectory.UI.Interfaces
         EmployeeView? ViewEmployee(string empId);
         string GetNewEmployeeId(string firstName, string lastName);
         Employee? AddEmployee(Employee employee);
-        Employee? EditEmployee(Employee employee);
+        int EditEmployee(Employee employee);
         Employee? DeleteEmployee(string empId);
         
         Employee? GetEmployeeById(string empId);

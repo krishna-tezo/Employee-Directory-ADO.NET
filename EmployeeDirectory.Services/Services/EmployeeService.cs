@@ -34,9 +34,7 @@ namespace EmployeeDirectory.Services
 
         public Employee AddEmployee(Employee employee)
         {
-            List<Employee> employees = GetEmployees();
-            employees.Add(employee);
-            jsonDataHandler.UpdateDataToJson<Employee>(employees);
+            employeeDataService.AddEmployee(employee);
             return employee;
         }
 
@@ -57,7 +55,7 @@ namespace EmployeeDirectory.Services
             }
         }
 
-        public Employee UpdateEmployee(Employee newEmployee)
+        public int UpdateEmployee(Employee newEmployee)
         {
             List<Employee> employees = GetEmployees();
             Employee? existingEmployee = employees.Find((emp) => emp.Id == newEmployee.Id);
@@ -66,9 +64,7 @@ namespace EmployeeDirectory.Services
             {
                 existingEmployee = newEmployee;
             }
-            jsonDataHandler.UpdateDataToJson<Employee>(employees);
-            return newEmployee;
-           
+            return employeeDataService.UpdateEmployee(existingEmployee);
         }
 
         public List<Employee> GetEmployees()

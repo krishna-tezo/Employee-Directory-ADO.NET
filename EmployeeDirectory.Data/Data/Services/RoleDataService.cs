@@ -40,9 +40,38 @@ namespace EmployeeDirectory.Data.Data.Services
             }
             return roles;
         }
-        public Role GetRoleById()
+        public Role GetRoleById(string id)
         {
             Role role = new Role();
+            try
+            {
+                string query = "SELECT " +
+                                "R.Id,R.Name,R.Description, D.DeptName, L.LocationName " +
+                                "FROM Role R " +
+                                "JOIN Department D ON R.DeptId = D.DeptId " +
+                                "JOIN Location L On R.LocationId = L.LocationId " +
+                                "WHERE R.Id = @Id";
+                SqlCommand command = new SqlCommand(query, ConnectionHandler.GetConnection());
+                command.Connection.Open();
+                command.Parameters.AddWithValue("@id",id);
+
+                SqlDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
+                if(reader.Read()) {
+                    role = new Role
+                    {
+                        Id = reader["Id"].ToString(),
+                        Name = reader["Name"].ToString(),
+                        Department = reader["DeptName"].ToString(),
+                        Description = reader["Description"].ToString(),
+                        Location = reader["LocationName"].ToString()
+                    };
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             return role;
         }
     }
