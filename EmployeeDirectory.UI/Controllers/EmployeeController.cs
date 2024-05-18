@@ -134,7 +134,7 @@ namespace EmployeeDirectory.UI.Controllers
             return employeeService.UpdateEmployee(employee);
         }
 
-        public Employee? DeleteEmployee(string empId)
+        public int DeleteEmployee(string empId)
         {
             return employeeService.DeleteEmployee(empId);
         }

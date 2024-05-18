@@ -7,7 +7,7 @@ namespace EmployeeDirectory.Interfaces
         string GenerateNewId(string firstName, string lastName);
         Employee AddEmployee(Employee employee);
         List<Employee> GetEmployees();
-        Employee? DeleteEmployee(string empId);
+        int DeleteEmployee(string empId);
         Employee? GetEmployeeById(string id);
         int UpdateEmployee(Employee employee);
 

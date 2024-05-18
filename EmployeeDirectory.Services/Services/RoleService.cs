@@ -2,6 +2,7 @@
 using EmployeeDirectory.DATA;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
+using EmployeeDirectory.Models.Models;
 using System.Data;
 
 namespace EmployeeDirectory.Services
@@ -20,8 +21,14 @@ namespace EmployeeDirectory.Services
         public Role AddRole(Role role)
         {
             List<Role> roles = GetAllRoles();
-            roles.Add(role);
-            jsonDataHandler.UpdateDataToJson(roles);
+            //roles.Add(role);
+            //jsonDataHandler.UpdateDataToJson(roles);
+            //return role;
+
+            string departmentId = roleDataService.GetDepartmentId(role.Department);
+            string locationId = roleDataService.GetLocationId(role.Location);
+            if()
+            roleDataService.Add(role,departmentId,locationId);
             return role;
         }
 
@@ -54,14 +61,20 @@ namespace EmployeeDirectory.Services
                                                     .AsEnumerable()
                                                     .Select(role => new Tuple<string, string>(role.Id, role.Name)).ToList();
 
-            return roleDetails;
-            
+            return roleDetails; 
         }
 
         public List<string> GetAllDepartments()
         {
             List<Role> roles = GetAllRoles();
             return roles.Select(role => role.Department).Distinct().ToList()!;
+        }
+
+
+        public bool DoesLocationExist(string location)
+        {
+            List<Role> roles = GetAllRoles();
+            return roles.Any(role => role.Location == location);
         }
 
         public List<string> GetAllRoleNamesByDepartment(string department)

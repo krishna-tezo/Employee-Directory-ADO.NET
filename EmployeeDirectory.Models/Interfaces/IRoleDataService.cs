@@ -6,5 +6,7 @@ namespace EmployeeDirectory.Data.Data.Services
     {
         List<Role> GetRoles();
         Role GetRoleById(string roleId);
+        public string GetLocationId(string locationName);
+        public string GetDepartmentId(string departmentName);
     }
 }

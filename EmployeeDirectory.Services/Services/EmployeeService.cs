@@ -38,21 +38,23 @@ namespace EmployeeDirectory.Services
             return employee;
         }
 
-        public Employee? DeleteEmployee(string empId)
+        public int DeleteEmployee(string empId)
         {
-            List<Employee> employees = GetEmployees();
-            Employee? employee = employees.Find(emp => emp.Id == empId);
-            if (employee != null)
-            {
-                employee.IsDeleted = true;
-                jsonDataHandler.UpdateDataToJson<Employee>(employees);
-                employees.Remove(employee);
-                return employee;
-            }
-            else
-            {
-                return null;
-            }
+            //List<Employee> employees = GetEmployees();
+            //Employee? employee = employees.Find(emp => emp.Id == empId);
+            //if (employee != null)
+            //{
+            //    employee.IsDeleted = true;
+            //    jsonDataHandler.UpdateDataToJson<Employee>(employees);
+            //    employees.Remove(employee);
+            //    return employee;
+            //}
+            //else
+            //{
+            //    return null;
+            //}
+            return employeeDataService.DeleteEmployee(empId);
+
         }
 
         public int UpdateEmployee(Employee newEmployee)

@@ -9,7 +9,7 @@ namespace EmployeeDirectory.UI.Interfaces
         string GetNewEmployeeId(string firstName, string lastName);
         Employee? AddEmployee(Employee employee);
         int EditEmployee(Employee employee);
-        Employee? DeleteEmployee(string empId);
+        int DeleteEmployee(string empId);
         
         Employee? GetEmployeeById(string empId);
     }

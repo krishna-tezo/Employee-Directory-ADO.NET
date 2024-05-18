@@ -7,6 +7,7 @@ namespace EmployeeDirectory.Data.Data.Services
         List<Employee> GetEmployees();
         Employee GetEmployeeById(string id);
         int UpdateEmployee(Employee employee);
+        int DeleteEmployee(string id);
         void AddEmployee(Employee employee);
     }
 }

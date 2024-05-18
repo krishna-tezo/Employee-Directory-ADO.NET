@@ -5,7 +5,6 @@ using EmployeeDirectory.Models.Models;
 using EmployeeDirectory.UI.Interfaces;
 using EmployeeDirectory.ViewModel;
 using System.Globalization;
-using System.Reflection.Metadata;
 
 
 namespace EmployeeDirectory.UI.UIServices
@@ -211,13 +210,13 @@ namespace EmployeeDirectory.UI.UIServices
             while (true);
 
             string? roleId = GetRoleOptions();
-            Tuple<string,string> projectDetails = GetProjectOptions();
+            Tuple<string, string> projectDetails = GetProjectOptions();
 
 
 
             if (formType == EmployeeFormType.Add)
             {
-                empId = employeeController.GetNewEmployeeId(firstName,lastName);
+                empId = employeeController.GetNewEmployeeId(firstName, lastName);
             }
 
 
@@ -235,7 +234,7 @@ namespace EmployeeDirectory.UI.UIServices
 
             return employee;
         }
-        
+
         //Get Role
         public string GetRoleOptions()
         {
@@ -244,7 +243,7 @@ namespace EmployeeDirectory.UI.UIServices
             List<Tuple<string, string>> options = new List<Tuple<string, string>>();
             Console.WriteLine("\n\n----Available Roles----\n");
             options = roleController.GetRoleNames();
-            
+
             Dictionary<string, string> optionsMap = [];
             options.ForEach(option =>
             {
@@ -264,16 +263,16 @@ namespace EmployeeDirectory.UI.UIServices
         }
 
         // Get Project Options
-        public Tuple<string,string> GetProjectOptions()
+        public Tuple<string, string> GetProjectOptions()
         {
             Tuple<string, string> projectDetails;
             string? inputKey;
             int number = 1;
-            List<Tuple<string, string,string>> options = new List<Tuple<string, string,string>>();
+            List<Tuple<string, string, string>> options = new List<Tuple<string, string, string>>();
             Console.WriteLine("\n\n----Available Projects----\n");
             options = projectController.GetProjectNames();
 
-            Dictionary<string, Tuple<string,string>> optionsMap = [];
+            Dictionary<string, Tuple<string, string>> optionsMap = [];
             options.ForEach(option =>
             {
                 optionsMap.Add(number.ToString(), new Tuple<string, string>(option.Item1, option.Item2));
@@ -293,6 +292,30 @@ namespace EmployeeDirectory.UI.UIServices
 
         }
         //Get Employee Role Details From Roles Data
+        public string GetDepartmentsOption()
+        {
+            string? inputKey;
+            int number = 1;
+            List<string> options = new List<string>();
+            Console.WriteLine("\n\n----Available Departments----\n");
+            options = roleController.GetAllDepartments();
+
+            Dictionary<string, string> optionsMap = [];
+
+            options.ForEach(option =>
+            {
+                optionsMap.Add(number.ToString(), option);
+                Console.WriteLine(number + ". " + option);
+                number++;
+            });
+            inputKey = Console.ReadLine();
+            if (inputKey == null || !optionsMap.ContainsKey(inputKey))
+            {
+                Console.WriteLine("Please Enter a valid option");
+            }
+            return optionsMap[inputKey!];
+        }
+
         public string GetEmployeeRoleDetails(string parameter, string department = "", string roleName = "")
         {
             string? inputKey;
@@ -408,8 +431,8 @@ namespace EmployeeDirectory.UI.UIServices
                 }
                 else if (empId != "-1")
                 {
-                    employee = employeeController.DeleteEmployee(empId);
-                    if (employee == null)
+                    int status = employeeController.DeleteEmployee(empId);
+                    if (status <= 0)
                         Console.WriteLine("Employee was not found");
                     else
                     {
@@ -452,7 +475,7 @@ namespace EmployeeDirectory.UI.UIServices
 
             Console.WriteLine("\n----Welcome to Add Role Menu----\n");
             Console.WriteLine("\n----Input Role Details----\n");
-            string? department = GetEmployeeRoleDetails("department");
+            string? department = GetDepartmentsOption();
 
             string? roleName;
             string? location;
@@ -471,7 +494,7 @@ namespace EmployeeDirectory.UI.UIServices
 
                 roleId = roleController.GetRoleId(roleName!, location!);
 
-                if(string.IsNullOrEmpty(roleName) || string.IsNullOrEmpty(location) || string.IsNullOrEmpty(description))
+                if (string.IsNullOrEmpty(roleName) || string.IsNullOrEmpty(location) || string.IsNullOrEmpty(description))
                 {
                     Console.WriteLine("Don't leave any field");
                 }
@@ -498,7 +521,6 @@ namespace EmployeeDirectory.UI.UIServices
             roleController.Add(role);
             Console.WriteLine("New Role has been added");
         }
-
         public bool DoesRoleIdExist(string roleId)
         {
             List<Role> roles = roleController.ViewRoles();

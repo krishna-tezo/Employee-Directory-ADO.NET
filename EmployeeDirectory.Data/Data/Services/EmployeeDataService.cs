@@ -1,5 +1,4 @@
-﻿using EmployeeDirectory.Interfaces;
-using EmployeeDirectory.Models;
+﻿using EmployeeDirectory.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Globalization;
@@ -14,7 +13,7 @@ namespace EmployeeDirectory.Data.Data.Services
             List<Employee> employees = new List<Employee>();
             try
             {
-                string query = "SELECT * FROM EMPLOYEE";
+                string query = "SELECT * FROM Employee WHERE IsDeleted != '1'";
 
                 SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(query, ConnectionHandler.GetConnection());
 
@@ -160,6 +159,30 @@ namespace EmployeeDirectory.Data.Data.Services
                 cmd.Parameters.AddWithValue("@ProjectId", employee.ProjectId);
                 cmd.Parameters.AddWithValue("@RoleId", employee.RoleId);
                 cmd.Parameters.AddWithValue("@IsDeleted", employee.IsDeleted);
+
+                connection.Open();
+                rowsAffected = cmd.ExecuteNonQuery();
+                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return rowsAffected;
+        }
+
+        public int DeleteEmployee(string id)
+        {
+            int rowsAffected = -1;
+            try
+            {
+                SqlConnection connection = ConnectionHandler.GetConnection();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = connection;
+
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = "UPDATE Employee SET IsDeleted = '1' WHERE Id=@Id";
+                cmd.Parameters.AddWithValue("@Id", id);
 
                 connection.Open();
                 rowsAffected = cmd.ExecuteNonQuery();

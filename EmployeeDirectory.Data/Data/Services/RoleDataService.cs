@@ -74,5 +74,48 @@ namespace EmployeeDirectory.Data.Data.Services
             }
             return role;
         }
+
+        public string GetLocationId(string locationName)
+        {
+            string id=null;
+            try
+            {
+                string query = "SELECT LocationId FROM Location WHERE LocationName = @LocationName; ";
+                                
+                SqlCommand command = new SqlCommand(query, ConnectionHandler.GetConnection());
+                command.Connection.Open();
+                command.Parameters.AddWithValue("@LocationName", locationName);
+
+                id=command.ExecuteScalar().ToString();
+
+                command.Connection.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return id;
+        }
+
+        public string GetDepartmentId(string departmentName)
+        {
+            string id = null;
+            try
+            {
+                string query = "SELECT DeptId FROM Department WHERE DeptName = @DeptName";
+
+                SqlCommand command = new SqlCommand(query, ConnectionHandler.GetConnection());
+                command.Connection.Open();
+                command.Parameters.AddWithValue("@DeptName", departmentName);
+
+                id = command.ExecuteScalar().ToString();
+                command.Connection.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return id;
+        }
     }
 }
