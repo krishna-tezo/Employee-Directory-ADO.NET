@@ -21,14 +21,10 @@ namespace EmployeeDirectory.Services
         public Role AddRole(Role role)
         {
             List<Role> roles = GetAllRoles();
-            //roles.Add(role);
-            //jsonDataHandler.UpdateDataToJson(roles);
-            //return role;
-
+            
             string departmentId = roleDataService.GetDepartmentId(role.Department);
             string locationId = roleDataService.GetLocationId(role.Location);
-            if()
-            roleDataService.Add(role,departmentId,locationId);
+            roleDataService.Add(role, departmentId, locationId);
             return role;
         }
 

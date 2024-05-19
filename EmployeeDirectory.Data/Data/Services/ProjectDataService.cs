@@ -77,10 +77,10 @@ namespace EmployeeDirectory.Data.Data.Services
             return project;
         }
 
-        public int AddLocation()
-        {
+        //public int AddLocation()
+        //{
             
-        }
+        //}
 
     }
 }

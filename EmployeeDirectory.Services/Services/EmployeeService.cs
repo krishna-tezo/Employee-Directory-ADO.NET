@@ -20,15 +20,22 @@ namespace EmployeeDirectory.Services
         }
         public string GenerateNewId(string firstName, string lastName)
         {
-            List<Employee> employees = this.GetEmployees();
-            Random random = new Random();
-            string newRoleId = "TZ" + firstName.Substring(0, 1).ToUpper() + lastName.Substring(0, 1).ToUpper() + (random.Next()%10000).ToString("D4");
-            if (employees.Exists((emp) => emp.Id == newRoleId))
-            {
-                GenerateNewId(firstName, lastName);
-            }
+            string lastEmpId = EmployeeDataService.GetLastEmployeeId();
+            string prefix = "TEZ";
+            string numericPart = lastEmpId.Substring(prefix.Length);
 
-            return newRoleId;
+            if (int.TryParse(numericPart, out int numericId))
+            {
+
+                int newNumericId = numericId + 1;
+
+                string newEmpId = prefix + newNumericId.ToString("D5");
+                return newEmpId;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid employee ID format.");
+            }
         }
 
 
