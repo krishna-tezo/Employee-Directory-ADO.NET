@@ -84,7 +84,6 @@ namespace EmployeeDirectory.UI.Controllers
             Mapper mapper = GetEmployeeViewMapper();
 
             Employee? employee = employeeService.GetEmployeeById(empId);
-            Project? project = projectService.GetProjectById(employee.ProjectId);
 
             EmployeeView? employeeToView = new EmployeeView();
             if (employee == null)
@@ -94,6 +93,7 @@ namespace EmployeeDirectory.UI.Controllers
             else
             {   
 
+                Project? project = projectService.GetProjectById(employee.ProjectId);
                 Role role = roleService.GetRoleById(employee.RoleId!);
                 if (role == null)
                 {

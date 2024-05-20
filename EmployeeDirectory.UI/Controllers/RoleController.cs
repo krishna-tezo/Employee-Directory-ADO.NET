@@ -16,16 +16,20 @@ namespace EmployeeDirectory.Controllers
         {
             return roleService.GetAllRoles();
         }
-        public Role Add(Role role)
+        public int Add(Role role)
         {
-            return roleService.AddRole(role);
+            return roleService.Add(role);
+        }
+        public bool DoesRoleExists(string roleName, string location)
+        {
+            return roleService.DoesRoleExists(roleName, location);
+        }
+        public string GenerateRoleId()
+        {
+            return roleService.GenerateRoleId();
         }
 
-        public string GetRoleId(string roleName, string location)
-        {
-            return roleService.GenerateRoleId(roleName, location);
-        }
-        public List<Tuple<string, string>> GetRoleNames()
+        public List<Tuple<string, string, string>> GetRoleNames()
         {
             return roleService.GetRoleNames();
         }

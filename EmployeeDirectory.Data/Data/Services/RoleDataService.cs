@@ -8,31 +8,34 @@ namespace EmployeeDirectory.Data.Data.Services
     {
         public List<Role> GetRoles()
         {
-
             List<Role> roles = new List<Role>();
             try
             {
-                string query = "SELECT " +
-                                "R.Id,R.Name,R.Description, D.DeptName, L.LocationName " +
-                                "FROM Role R " +
-                                "JOIN Department D ON R.DeptId = D.DeptId " +
-                                "JOIN Location L On R.LocationId = L.LocationId ";
-
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(query, ConnectionHandler.GetConnection());
-
-                DataTable dataTable = new DataTable();
-                sqlDataAdapter.Fill(dataTable);
-                foreach (DataRow row in dataTable.Rows)
+                using (SqlConnection conn = ConnectionHandler.GetConnection())
                 {
-                    Role role = new Role
+                    string query = "SELECT " +
+                                "R.Id,R.Name,R.Description, D.Name as DeptName, L.Name as LocationName " +
+                                "FROM Role R " +
+                                "JOIN Department D ON R.DeptId = D.Id " +
+                                "JOIN Location L On R.LocationId = L.Id ";
+
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        Id = row["Id"].ToString(),
-                        Name = row["Name"].ToString(),
-                        Department = row["DeptName"].ToString(),
-                        Description = row["Description"].ToString(),
-                        Location = row["LocationName"].ToString()
-                    };
-                    roles.Add(role);
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            Role role = new Role
+                            {
+                                Id = reader["Id"].ToString(),
+                                Name = reader["Name"].ToString(),
+                                Department = reader["DeptName"].ToString(),
+                                Description = reader["Description"].ToString(),
+                                Location = reader["LocationName"].ToString()
+                            };
+                            roles.Add(role);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -41,34 +44,38 @@ namespace EmployeeDirectory.Data.Data.Services
             }
             return roles;
         }
+
         public Role GetRoleById(string id)
         {
             Role role = new Role();
             try
             {
                 string query = "SELECT " +
-                                "R.Id,R.Name,R.Description, D.DeptName, L.LocationName " +
+                                "R.Id,R.Name,R.Description, D.Name as DeptName, L.Name as LocationName " +
                                 "FROM Role R " +
-                                "JOIN Department D ON R.DeptId = D.DeptId " +
-                                "JOIN Location L On R.LocationId = L.LocationId " +
+                                "JOIN Department D ON R.DeptId = D.Id " +
+                                "JOIN Location L On R.LocationId = L.Id " +
                                 "WHERE R.Id = @Id";
-                SqlCommand command = new SqlCommand(query, ConnectionHandler.GetConnection());
-                command.Connection.Open();
-                command.Parameters.AddWithValue("@id", id);
 
-                SqlDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
-                if (reader.Read())
+                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlCommand command = new SqlCommand(query, conn))
                 {
-                    role = new Role
-                    {
-                        Id = reader["Id"].ToString(),
-                        Name = reader["Name"].ToString(),
-                        Department = reader["DeptName"].ToString(),
-                        Description = reader["Description"].ToString(),
-                        Location = reader["LocationName"].ToString()
-                    };
-                }
+                    command.Parameters.AddWithValue("@id", id);
+                    conn.Open();
 
+                    SqlDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
+                    if (reader.Read())
+                    {
+                        role = new Role
+                        {
+                            Id = reader["Id"].ToString(),
+                            Name = reader["Name"].ToString(),
+                            Department = reader["DeptName"].ToString(),
+                            Description = reader["Description"].ToString(),
+                            Location = reader["LocationName"].ToString()
+                        };
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -77,39 +84,45 @@ namespace EmployeeDirectory.Data.Data.Services
             return role;
         }
 
-        public int Add(Role role, string locationId, string departmentId)
-        {   
-
-            using(SqlConnection conn = ConnectionHandler.GetConnection())
+        public int Add(Role role, string departmentId, string locationId)
+        {
+            int rowsAffected = 0;
+            using (SqlConnection conn = ConnectionHandler.GetConnection())
             {
-                string query = "INSERT INTO Role Values " +
-                    "@RoleId, @RoleName, @DepartmentId, @LocationId, @Desription";
-                SqlCommand command = new SqlCommand(query, ConnectionHandler.GetConnection());
-                command.Connection.Open();
-                command.Parameters.AddWithValue("@RoleId", role.Id);
-                command.Parameters.AddWithValue("@RoleName", role.Name);
-                command.Parameters.AddWithValue("@DepartmentId", departmentId);
-                command.Parameters.AddWithValue("@LocationId", departmentId);
-                command.Parameters.AddWithValue("@Description", role.Description);
+                string query = "INSERT INTO Role Values( " +
+                    "@RoleId, @RoleName, @DepartmentId, @Description, @LocationId)";
 
+                using (SqlCommand command = new SqlCommand(query, conn))
+                {
+                    command.Parameters.AddWithValue("@RoleId", role.Id);
+                    command.Parameters.AddWithValue("@RoleName", role.Name);
+                    command.Parameters.AddWithValue("@DepartmentId", departmentId);
+                    command.Parameters.AddWithValue("@LocationId", locationId);
+                    command.Parameters.AddWithValue("@Description", role.Description);
 
+                    conn.Open();
+                    rowsAffected = command.ExecuteNonQuery();
+                    conn.Close();
+                }
             }
+            return rowsAffected;
         }
-
 
         public string GetDepartmentId(string departmentName)
         {
             string id = null;
             try
             {
-                string query = "SELECT DeptId FROM Department WHERE DeptName = @DeptName";
+                string query = "SELECT Id FROM Department WHERE Name = @DeptName";
 
-                SqlCommand command = new SqlCommand(query, ConnectionHandler.GetConnection());
-                command.Connection.Open();
-                command.Parameters.AddWithValue("@DeptName", departmentName);
-
-                id = command.ExecuteScalar().ToString();
-                command.Connection.Close();
+                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlCommand command = new SqlCommand(query, conn))
+                {
+                    command.Parameters.AddWithValue("@DeptName", departmentName);
+                    conn.Open();
+                    id = command.ExecuteScalar()?.ToString();
+                    conn.Close();
+                }
             }
             catch (Exception ex)
             {
@@ -118,7 +131,6 @@ namespace EmployeeDirectory.Data.Data.Services
             return id;
         }
 
-
         public string GetLocationId(string locationName)
         {
             try
@@ -126,7 +138,7 @@ namespace EmployeeDirectory.Data.Data.Services
                 using (SqlConnection conn = ConnectionHandler.GetConnection())
                 {
                     conn.Open();
-                    string query = "SELECT LocationId FROM Location WHERE LocationName = @LocationName";
+                    string query = "SELECT Id FROM Location WHERE Name = @LocationName";
 
                     using (SqlCommand command = new SqlCommand(query, conn))
                     {
@@ -139,17 +151,19 @@ namespace EmployeeDirectory.Data.Data.Services
                     }
 
                     // If the location does not exist, get the maximum LocationId
-                    query = "SELECT MAX(LocationId) FROM Location";
+                    query = "SELECT MAX(Id) FROM Location";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        string? result = cmd.ExecuteScalar().ToString();
+                        string? result = cmd.ExecuteScalar()?.ToString();
                         if (result != null)
                         {
-                            string newId = GenerateNewLocationId(result?.ToString());
+                            string newId = GenerateNewLocationId(result);
                             InsertLocation(newId, locationName);
                             return newId;
                         }
                     }
+
+                    conn.Close();
                 }
             }
             catch (Exception ex)
@@ -157,12 +171,9 @@ namespace EmployeeDirectory.Data.Data.Services
                 Console.WriteLine(ex.Message);
             }
             return "LOC001";
-
         }
 
-
-
-        public static string GenerateNewLocationId(string lastLocId)
+        public string GenerateNewLocationId(string lastLocId)
         {
             string prefix = "LOC";
             string numericPart = lastLocId.Substring(prefix.Length);
@@ -178,19 +189,24 @@ namespace EmployeeDirectory.Data.Data.Services
             }
         }
 
-        public static void InsertLocation(string newLocationId, string newLocationName)
+        public int InsertLocation(string newLocationId, string newLocationName)
         {
             using (SqlConnection conn = ConnectionHandler.GetConnection())
             {
-                conn.Open();
-                string insertQuery = "INSERT INTO Location (LocationId, LocationName) VALUES (@LocationId, @LocationName)";
+                string insertQuery = "INSERT INTO Location (Id, Name) VALUES (@LocationId, @LocationName)";
                 using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
                 {
                     insertCmd.Parameters.AddWithValue("@LocationId", newLocationId);
                     insertCmd.Parameters.AddWithValue("@LocationName", newLocationName);
-                    insertCmd.ExecuteNonQuery();
+
+                    conn.Open();
+                    int rowsAffected = insertCmd.ExecuteNonQuery();
+                    conn.Close();
+                    return rowsAffected;
                 }
             }
         }
     }
+
+
 }

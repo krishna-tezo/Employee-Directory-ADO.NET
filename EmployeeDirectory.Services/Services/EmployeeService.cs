@@ -9,14 +9,11 @@ namespace EmployeeDirectory.Services
     {
 
         
-        private IJsonDataHandler jsonDataHandler;
         private IEmployeeDataService employeeDataService;
         
-        public EmployeeService(IJsonDataHandler jsonDataHandler,IEmployeeDataService employeeDataService, IProjectDataService projectDataService)
+        public EmployeeService(IEmployeeDataService employeeDataService)
         {
-            this.jsonDataHandler = jsonDataHandler;
             this.employeeDataService = employeeDataService;
-           
         }
         public string GenerateNewId(string firstName, string lastName)
         {
@@ -81,7 +78,6 @@ namespace EmployeeDirectory.Services
             List<Employee> employees = [];
             try
             {
-                //employees = jsonDataHandler.GetDataFromJson<Employee>();
                 employees = employeeDataService.GetEmployees();
             }
             catch(Exception ex)

@@ -12,27 +12,34 @@ namespace EmployeeDirectory.Data.Data.Services
             List<Project> projects = new List<Project>();
             try
             {
-                string query = "SELECT P.ProjectId," +
-                    "P.ProjectName," +
-                    "CONCAT(E.FirstName,' ',E.LastName) as ManagerName " +
-                    "FROM Project P " +
-                    "JOIN Manager M ON P.ManagerId = M.ManagerId " +
-                    "JOIN Employee E ON M.EmpId = E.Id ";
-
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(query, ConnectionHandler.GetConnection());
-
-                DataTable dataTable = new DataTable();
-                sqlDataAdapter.Fill(dataTable);
-                foreach (DataRow row in dataTable.Rows)
+                using (SqlConnection conn = ConnectionHandler.GetConnection())
                 {
-                    Project project = new Project
+                    string query = "SELECT P.Id," +
+                        "P.Name," +
+                        "CONCAT(E.FirstName,' ',E.LastName) as ManagerName " +
+                        "FROM Project P " +
+                        "JOIN Manager M ON P.ManagerId = M.Id " +
+                        "JOIN Employee E ON M.EmpId = E.Id ";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        Id = row["ProjectId"].ToString(),
-                        Name = row["ProjectName"].ToString(),
-                        ManagerName = row["ManagerName"].ToString()
-                    };
-                    projects.Add(project);
+                        conn.Open();
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        while(reader.Read())
+                        {
+                            Project project = new Project
+                            {
+                                Id = reader["Id"].ToString(),
+                                Name = reader["Name"].ToString(),
+                                ManagerName = reader["ManagerName"].ToString()
+                            };
+                            projects.Add(project);
+                        }
+                        conn.Close();
+                    }
                 }
+
             }
             catch (Exception ex)
             {
@@ -46,28 +53,34 @@ namespace EmployeeDirectory.Data.Data.Services
             Project project = new Project();
             try
             {
-                string query = "SELECT P.ProjectId," +
-                    "P.ProjectName," +
-                    "CONCAT(E.FirstName,' ',E.LastName) as ManagerName " +
-                    "FROM Project P " +
-                    "JOIN Manager M ON P.ManagerId = M.ManagerId " +
-                    "JOIN Employee E ON M.EmpId = E.Id " +
-                    "WHERE P.ProjectId = @id"
-                    ;
+                string query = "SELECT P.Id," +
+                        "P.Name," +
+                        "CONCAT(E.FirstName,' ',E.LastName) as ManagerName " +
+                        "FROM Project P " +
+                        "JOIN Manager M ON P.ManagerId = M.Id " +
+                        "JOIN Employee E ON M.EmpId = E.Id " +
+                        "WHERE P.Id = @id";
 
-                SqlCommand command = new SqlCommand(query, ConnectionHandler.GetConnection());
-                command.Parameters.AddWithValue("@id", id);
-                command.Connection.Open();
-                SqlDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
-
-                if(reader.Read())
+                using (SqlConnection conn = ConnectionHandler.GetConnection())
                 {
-                    project = new Project
+                    using (SqlCommand cmd = new(query, conn))
                     {
-                        Id = reader["ProjectId"].ToString(),
-                        Name = reader["ProjectName"].ToString(),
-                        ManagerName = reader["ManagerName"].ToString()
-                    };
+                        conn.Open();
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        SqlDataReader reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+                        if (reader.Read())
+                        {
+                            project = new Project
+                            {
+                                Id = reader["Id"].ToString(),
+                                Name = reader["Name"].ToString(),
+                                ManagerName = reader["ManagerName"].ToString()
+                            };
+                        }
+                        conn.Close();
+                    }
                 }
             }
             catch (Exception ex)
@@ -76,11 +89,6 @@ namespace EmployeeDirectory.Data.Data.Services
             }
             return project;
         }
-
-        //public int AddLocation()
-        //{
-            
-        //}
 
     }
 }

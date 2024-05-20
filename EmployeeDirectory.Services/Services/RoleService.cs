@@ -10,22 +10,49 @@ namespace EmployeeDirectory.Services
     public class RoleService : IRoleService
     {
 
-        private IJsonDataHandler jsonDataHandler;
         private IRoleDataService roleDataService;
        
-        public RoleService(IJsonDataHandler jsonDataHandler, IRoleDataService roleDataService)
+        public RoleService(IRoleDataService roleDataService)
         {
-            this.jsonDataHandler = jsonDataHandler;
             this.roleDataService = roleDataService;
         }
-        public Role AddRole(Role role)
+        public int Add(Role role)
         {
             List<Role> roles = GetAllRoles();
-            
+
+
             string departmentId = roleDataService.GetDepartmentId(role.Department);
             string locationId = roleDataService.GetLocationId(role.Location);
-            roleDataService.Add(role, departmentId, locationId);
-            return role;
+            
+
+            int rowsAffected = roleDataService.Add(role, departmentId, locationId);
+            return rowsAffected;
+        }
+
+        public bool DoesRoleExists(string roleName, string location)
+        {
+            List<Role> roles = GetAllRoles();
+            return roles.Any(role => role.Name.Equals(roleName) && role.Location.Equals(location));
+        }
+        public string GenerateRoleId()
+        {
+            List<Role> roles = GetAllRoles();
+            string lastRoleId = roles.Last().Id;
+
+            string newRoleId;
+            string prefix = "RL";
+            string numericPart = lastRoleId.Substring(prefix.Length);
+
+            if (int.TryParse(numericPart, out int numericId))
+            {
+                int newNumericId = numericId + 1;
+                newRoleId = prefix + newNumericId.ToString("D4");
+            }
+            else
+            {
+                throw new ArgumentException("Invalid role ID format.");
+            }
+            return newRoleId;
         }
 
         public List<Role> GetAllRoles()
@@ -44,18 +71,13 @@ namespace EmployeeDirectory.Services
             }
             return role;
         }
-
-        public string GenerateRoleId(string roleName, string location)
-        {
-            return roleName[..3] + location[..3];
-        }
         
-        public List<Tuple<string, string>> GetRoleNames()
+        public List<Tuple<string, string, string>> GetRoleNames()
         {
             List<Role> roles = GetAllRoles();
-            List<Tuple<string, string>> roleDetails = roles.Select(role => new { role.Id, role.Name})
+            List<Tuple<string, string, string>> roleDetails = roles.Select(role => new { role.Id, role.Name, role.Location})
                                                     .AsEnumerable()
-                                                    .Select(role => new Tuple<string, string>(role.Id, role.Name)).ToList();
+                                                    .Select(role => new Tuple<string, string, string>(role.Id, role.Name, role.Location)).ToList();
 
             return roleDetails; 
         }
