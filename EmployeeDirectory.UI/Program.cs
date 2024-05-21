@@ -1,5 +1,6 @@
 ﻿using EmployeeDirectory.Core;
 using EmployeeDirectory.UI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EmployeeDirectory

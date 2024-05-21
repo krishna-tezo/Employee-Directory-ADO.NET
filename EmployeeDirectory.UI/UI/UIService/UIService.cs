@@ -244,12 +244,15 @@ namespace EmployeeDirectory.UI.UIServices
             options = roleController.GetRoleNames();
 
             Dictionary<string, string> optionsMap = [];
+            Console.WriteLine("-----------------------------------------------------------");
             options.ForEach(option =>
             {
                 optionsMap.Add(number.ToString(), option.Item1);
-                Console.WriteLine(number + ". " + option.Item2 + " - "+ option.Item3);
+                string role = String.Format("|{0,-5}|{1,-30}|{2,-20}|", number, option.Item2, option.Item3);
+                Console.WriteLine(role);
                 number++;
             });
+            Console.WriteLine("-----------------------------------------------------------");
 
             Console.Write("\nChoose Option:");
             inputKey = Console.ReadLine();

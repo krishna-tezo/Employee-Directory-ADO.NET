@@ -1,20 +1,25 @@
-﻿using EmployeeDirectory.Models;
+﻿using EmployeeDirectory.Data.Data.Services;
+using EmployeeDirectory.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Globalization;
 
 
-namespace EmployeeDirectory.Data.Data.Services
+namespace EmployeeDirectory.Data.Services
 {
     public class EmployeeDataService : IEmployeeDataService
     {
+        private IDbConnection dbConnection;
+        public EmployeeDataService(IDbConnection dbConnection) {
+            this.dbConnection = dbConnection;
+        }
 
         public List<Employee> GetEmployees()
         {
             List<Employee> employees = new List<Employee>();
             try
             {
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
                     string query = "SELECT * FROM Employee WHERE IsDeleted != '1'";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -66,7 +71,7 @@ namespace EmployeeDirectory.Data.Data.Services
             try
             {
                 string query = "SELECT * FROM EMPLOYEE WHERE ID = " + id;
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -112,7 +117,7 @@ namespace EmployeeDirectory.Data.Data.Services
         {
             try
             {
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
                     string query = "INSERT INTO Employee VALUES (@Id, @FirstName, @LastName, @Email, @DOB, @MobileNumber, @JoinDate, @ProjectId, @RoleId, @IsDeleted)";
 
@@ -148,7 +153,7 @@ namespace EmployeeDirectory.Data.Data.Services
             int rowsAffected = -1;
             try
             {
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
                     string query = "UPDATE Employee SET " +
                                     "FirstName = @FirstName, " +
@@ -193,7 +198,7 @@ namespace EmployeeDirectory.Data.Data.Services
             int rowsAffected = -1;
             try
             {
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
                     string query = "UPDATE Employee SET IsDeleted = '1' WHERE Id=@Id";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -214,10 +219,10 @@ namespace EmployeeDirectory.Data.Data.Services
             }
             return rowsAffected;
         }
-        public static string GetLastEmployeeId()
+        public string GetLastEmployeeId()
         {
             string? result = null;
-            using (SqlConnection conn = ConnectionHandler.GetConnection())
+            using (SqlConnection conn = dbConnection.GetConnection())
             {
                 conn.Open();
                 string query = "SELECT MAX(id) FROM Employee";

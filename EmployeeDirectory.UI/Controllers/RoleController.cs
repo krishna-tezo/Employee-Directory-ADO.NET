@@ -30,7 +30,8 @@ namespace EmployeeDirectory.Controllers
         }
 
         public List<Tuple<string, string, string>> GetRoleNames()
-        {
+        {   
+            
             return roleService.GetRoleNames();
         }
 

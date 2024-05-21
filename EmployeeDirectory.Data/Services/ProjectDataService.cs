@@ -1,18 +1,24 @@
-﻿using EmployeeDirectory.Models.Models;
+﻿using EmployeeDirectory.Data.Data.Services;
+using EmployeeDirectory.Models.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace EmployeeDirectory.Data.Data.Services
+namespace EmployeeDirectory.Data.Services
 {
     public class ProjectDataService : IProjectDataService
     {
+        private IDbConnection dbConnection;
+        public ProjectDataService(IDbConnection dbConnection)
+        {
+            this.dbConnection = dbConnection;
+        }
         public List<Project> GetProjects()
         {
 
             List<Project> projects = new List<Project>();
             try
             {
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
                     string query = "SELECT P.Id," +
                         "P.Name," +
@@ -26,7 +32,7 @@ namespace EmployeeDirectory.Data.Data.Services
                         conn.Open();
                         SqlDataReader reader = cmd.ExecuteReader();
 
-                        while(reader.Read())
+                        while (reader.Read())
                         {
                             Project project = new Project
                             {
@@ -61,7 +67,7 @@ namespace EmployeeDirectory.Data.Data.Services
                         "JOIN Employee E ON M.EmpId = E.Id " +
                         "WHERE P.Id = @id";
 
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
                     using (SqlCommand cmd = new(query, conn))
                     {

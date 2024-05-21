@@ -1,17 +1,23 @@
-﻿using EmployeeDirectory.Models;
+﻿using EmployeeDirectory.Data.Data.Services;
+using EmployeeDirectory.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace EmployeeDirectory.Data.Data.Services
+namespace EmployeeDirectory.Data.Services
 {
     public class RoleDataService : IRoleDataService
     {
+        private IDbConnection dbConnection;
+        public RoleDataService(IDbConnection dbConnection)
+        {
+            this.dbConnection = dbConnection;
+        }
         public List<Role> GetRoles()
         {
             List<Role> roles = new List<Role>();
             try
             {
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
                     string query = "SELECT " +
                                 "R.Id,R.Name,R.Description, D.Name as DeptName, L.Name as LocationName " +
@@ -57,7 +63,7 @@ namespace EmployeeDirectory.Data.Data.Services
                                 "JOIN Location L On R.LocationId = L.Id " +
                                 "WHERE R.Id = @Id";
 
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 using (SqlCommand command = new SqlCommand(query, conn))
                 {
                     command.Parameters.AddWithValue("@id", id);
@@ -87,7 +93,7 @@ namespace EmployeeDirectory.Data.Data.Services
         public int Add(Role role, string departmentId, string locationId)
         {
             int rowsAffected = 0;
-            using (SqlConnection conn = ConnectionHandler.GetConnection())
+            using (SqlConnection conn = dbConnection.GetConnection())
             {
                 string query = "INSERT INTO Role Values( " +
                     "@RoleId, @RoleName, @DepartmentId, @Description, @LocationId)";
@@ -115,7 +121,7 @@ namespace EmployeeDirectory.Data.Data.Services
             {
                 string query = "SELECT Id FROM Department WHERE Name = @DeptName";
 
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 using (SqlCommand command = new SqlCommand(query, conn))
                 {
                     command.Parameters.AddWithValue("@DeptName", departmentName);
@@ -135,7 +141,7 @@ namespace EmployeeDirectory.Data.Data.Services
         {
             try
             {
-                using (SqlConnection conn = ConnectionHandler.GetConnection())
+                using (SqlConnection conn = dbConnection.GetConnection())
                 {
                     conn.Open();
                     string query = "SELECT Id FROM Location WHERE Name = @LocationName";
@@ -191,7 +197,7 @@ namespace EmployeeDirectory.Data.Data.Services
 
         public int InsertLocation(string newLocationId, string newLocationName)
         {
-            using (SqlConnection conn = ConnectionHandler.GetConnection())
+            using (SqlConnection conn = dbConnection.GetConnection())
             {
                 string insertQuery = "INSERT INTO Location (Id, Name) VALUES (@LocationId, @LocationName)";
                 using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))

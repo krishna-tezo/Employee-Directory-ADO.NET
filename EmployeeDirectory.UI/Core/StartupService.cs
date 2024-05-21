@@ -9,20 +9,34 @@ using EmployeeDirectory.UI.Interfaces;
 using EmployeeDirectory.UI.Controllers;
 using EmployeeDirectory.Data.Data.Services;
 using EmployeeDirectory.Services.Services;
+using Microsoft.Extensions.Configuration;
+using EmployeeDirectory.Data.Services;
+using EmployeeDirectory.Data;
 
 namespace EmployeeDirectory.Core
 {
     public class StartupService
     {
-
         private IServiceCollection services;
         public StartupService(IServiceCollection services)
         {
             this.services = services;
+           
         }
 
         public ServiceProvider Configure()
         {
+            var configBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
+            string connectionString = configBuilder.GetSection("ConnectionStrings")["MyDBConnectionString"];
+            if(connectionString != null)
+            {
+                services.AddScoped<IDbConnection> (db=> new DbConnection(connectionString));
+            }
+            else
+            {
+                throw new Exception("Error");
+            }
             services.AddSingleton<IEmployeeDataService, EmployeeDataService>();
             services.AddSingleton<IRoleDataService, RoleDataService>();
             services.AddSingleton<IProjectDataService, ProjectDataService>();
@@ -37,6 +51,7 @@ namespace EmployeeDirectory.Core
             services.AddSingleton<IRoleController, RoleController>();
             services.AddSingleton<IProjectController, ProjectController>();
             services.AddSingleton<MainMenu>();
+            
 
             return services.BuildServiceProvider();
         }

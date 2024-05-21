@@ -1,8 +1,6 @@
 ﻿using EmployeeDirectory.Data.Data.Services;
-using EmployeeDirectory.DATA;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
-using EmployeeDirectory.Models.Models;
 using System.Data;
 
 namespace EmployeeDirectory.Services
@@ -75,9 +73,12 @@ namespace EmployeeDirectory.Services
         public List<Tuple<string, string, string>> GetRoleNames()
         {
             List<Role> roles = GetAllRoles();
-            List<Tuple<string, string, string>> roleDetails = roles.Select(role => new { role.Id, role.Name, role.Location})
-                                                    .AsEnumerable()
-                                                    .Select(role => new Tuple<string, string, string>(role.Id, role.Name, role.Location)).ToList();
+            
+            List <Tuple <string, string, string>> roleDetails = roles
+            .Select(role => new { role.Id, role.Name, role.Location })
+            .OrderBy(role => role.Name)
+            .Select(role => new Tuple<string, string, string>(role.Id, role.Name, role.Location))
+            .ToList();
 
             return roleDetails; 
         }

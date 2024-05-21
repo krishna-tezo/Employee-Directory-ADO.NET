@@ -9,5 +9,6 @@ namespace EmployeeDirectory.Data.Data.Services
         int UpdateEmployee(Employee employee);
         int DeleteEmployee(string id);
         void AddEmployee(Employee employee);
+        string GetLastEmployeeId();
     }
 }

@@ -1,5 +1,4 @@
 ﻿using EmployeeDirectory.Data.Data.Services;
-using EmployeeDirectory.DATA;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
 namespace EmployeeDirectory.Services
@@ -17,7 +16,7 @@ namespace EmployeeDirectory.Services
         }
         public string GenerateNewId(string firstName, string lastName)
         {
-            string lastEmpId = EmployeeDataService.GetLastEmployeeId();
+            string lastEmpId = employeeDataService.GetLastEmployeeId();
             string prefix = "TEZ";
             string numericPart = lastEmpId.Substring(prefix.Length);
 
