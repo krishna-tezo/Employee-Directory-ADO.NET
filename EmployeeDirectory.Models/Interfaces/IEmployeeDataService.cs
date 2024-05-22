@@ -8,7 +8,7 @@ namespace EmployeeDirectory.Data.Data.Services
         Employee GetEmployeeById(string id);
         int UpdateEmployee(Employee employee);
         int DeleteEmployee(string id);
-        void AddEmployee(Employee employee);
+        int AddEmployee(Employee employee);
         string GetLastEmployeeId();
     }
 }

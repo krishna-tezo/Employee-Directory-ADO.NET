@@ -40,6 +40,8 @@ namespace EmployeeDirectory.Core
             services.AddSingleton<IEmployeeDataService, EmployeeDataService>();
             services.AddSingleton<IRoleDataService, RoleDataService>();
             services.AddSingleton<IProjectDataService, ProjectDataService>();
+            services.AddSingleton<ICommonDataService , CommonDataService>();
+
             services.AddSingleton<IEmployeeService, EmployeeService>();
             services.AddSingleton<IRoleService, RoleService>();
             services.AddSingleton<IProjectService, ProjectService>();

@@ -1,93 +1,48 @@
 ﻿using EmployeeDirectory.Data.Data.Services;
 using EmployeeDirectory.Models;
 using Microsoft.Data.SqlClient;
-using System.Data;
-
 namespace EmployeeDirectory.Data.Services
 {
     public class RoleDataService : IRoleDataService
     {
         private IDbConnection dbConnection;
-        public RoleDataService(IDbConnection dbConnection)
+        private ICommonDataService commonDataServices;
+        public RoleDataService(IDbConnection dbConnection, ICommonDataService commonDataServices)
         {
             this.dbConnection = dbConnection;
+            this.commonDataServices = commonDataServices;
         }
+
+        private Role MapRole(SqlDataReader reader)
+        {
+            return new Role
+            {
+                Id = reader["Id"].ToString(),
+                Name = reader["Name"].ToString(),
+                Department = reader["DeptName"].ToString(),
+                Description = reader["Description"].ToString(),
+                Location = reader["LocationName"].ToString()
+            };
+        }
+
         public List<Role> GetRoles()
         {
-            List<Role> roles = new List<Role>();
-            try
-            {
-                using (SqlConnection conn = dbConnection.GetConnection())
-                {
-                    string query = "SELECT " +
-                                "R.Id,R.Name,R.Description, D.Name as DeptName, L.Name as LocationName " +
-                                "FROM Role R " +
-                                "JOIN Department D ON R.DeptId = D.Id " +
-                                "JOIN Location L On R.LocationId = L.Id ";
-
-                    conn.Open();
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        SqlDataReader reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            Role role = new Role
-                            {
-                                Id = reader["Id"].ToString(),
-                                Name = reader["Name"].ToString(),
-                                Department = reader["DeptName"].ToString(),
-                                Description = reader["Description"].ToString(),
-                                Location = reader["LocationName"].ToString()
-                            };
-                            roles.Add(role);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return roles;
+            string query = "SELECT " +
+                           "R.Id, R.Name, R.Description, D.Name as DeptName, L.Name as LocationName " +
+                           "FROM Role R " +
+                           "JOIN Department D ON R.DeptId = D.Id " +
+                           "JOIN Location L On R.LocationId = L.Id ";
+            return commonDataServices.GetData(query, MapRole);
         }
-
         public Role GetRoleById(string id)
         {
-            Role role = new Role();
-            try
-            {
-                string query = "SELECT " +
+            string query = "SELECT " +
                                 "R.Id,R.Name,R.Description, D.Name as DeptName, L.Name as LocationName " +
                                 "FROM Role R " +
                                 "JOIN Department D ON R.DeptId = D.Id " +
                                 "JOIN Location L On R.LocationId = L.Id " +
                                 "WHERE R.Id = @Id";
-
-                using (SqlConnection conn = dbConnection.GetConnection())
-                using (SqlCommand command = new SqlCommand(query, conn))
-                {
-                    command.Parameters.AddWithValue("@id", id);
-                    conn.Open();
-
-                    SqlDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection);
-                    if (reader.Read())
-                    {
-                        role = new Role
-                        {
-                            Id = reader["Id"].ToString(),
-                            Name = reader["Name"].ToString(),
-                            Department = reader["DeptName"].ToString(),
-                            Description = reader["Description"].ToString(),
-                            Location = reader["LocationName"].ToString()
-                        };
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return role;
+            return commonDataServices.GetSingleData(query,id,MapRole);
         }
 
         public int Add(Role role, string departmentId, string locationId)

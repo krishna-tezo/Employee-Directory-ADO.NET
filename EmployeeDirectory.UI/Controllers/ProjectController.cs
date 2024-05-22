@@ -15,13 +15,13 @@ namespace EmployeeDirectory.UI.Controllers
 
         public List<Project> ViewProjects()
         {
-            return projectService.GetProjects();
+            return projectService.GetProjects().DataList;
         }
 
 
         public List<Tuple<string, string, string>> GetProjectNames()
         {
-            return projectService.GetProjectNames();
+            return projectService.GetProjectNames().Data;
         }
 
 

@@ -1,19 +1,18 @@
 ﻿using EmployeeDirectory.Models;
 
-namespace EmployeeDirectory.Interfaces
+namespace EmployeeDirectory.Services
 {
     public interface IRoleService
     {
-        int Add(Role role);
-        bool DoesRoleExists(string  roleName, string location);
-        string GenerateRoleId();
-        Role GetRoleById(string id);
-        List<Tuple<string, string, string>> GetRoleNames();
-        List<string> GetAllDepartments();
-        List<string> GetAllLocationByDepartmentAndRoleNames(string roleName);
-        List<string> GetAllRoleNamesByDepartment(string department);
-
-        List<Role> GetAllRoles();
-
+        ServiceResult<int> Add(Role role);
+        ServiceResult<bool> DoesLocationExist(string location);
+        ServiceResult<bool> DoesRoleExists(string roleName, string location);
+        ServiceResult<string> GenerateRoleId();
+        ServiceResult<List<string>> GetAllDepartments();
+        ServiceResult<List<string>> GetAllLocationByDepartmentAndRoleNames(string roleName);
+        ServiceResult<List<string>> GetAllRoleNamesByDepartment(string department);
+        ServiceResult<Role> GetAllRoles();
+        ServiceResult<Role> GetRoleById(string id);
+        ServiceResult<List<Tuple<string, string, string>>> GetRoleNames();
     }
 }

@@ -1,11 +1,12 @@
-﻿using EmployeeDirectory.Models.Models;
+﻿using EmployeeDirectory.Models;
+using EmployeeDirectory.Models.Models;
 
 namespace EmployeeDirectory.Services.Services
 {
     public interface IProjectService
     {
-        List<Project> GetProjects();
-        Project GetProjectById(string id);
-        List<Tuple<string, string,string>> GetProjectNames();
+        public ServiceResult<Project> GetProjects();
+        public ServiceResult<Project> GetProjectById(string id);
+        public ServiceResult<List<Tuple<string, string, string>>> GetProjectNames();
     }
 }

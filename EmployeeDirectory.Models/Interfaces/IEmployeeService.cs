@@ -1,15 +1,14 @@
 ﻿using EmployeeDirectory.Models;
 
-namespace EmployeeDirectory.Interfaces
+namespace EmployeeDirectory.Services
 {
     public interface IEmployeeService
     {
-        string GenerateNewId(string firstName, string lastName);
-        Employee AddEmployee(Employee employee);
-        List<Employee> GetEmployees();
-        int DeleteEmployee(string empId);
-        Employee? GetEmployeeById(string id);
-        int UpdateEmployee(Employee employee);
-
+        ServiceResult<Employee> GetEmployees();
+        ServiceResult<Employee> GetEmployeeById(string id);
+        ServiceResult<int> UpdateEmployee(Employee newEmployee);
+        ServiceResult<int> AddEmployee(Employee employee);
+        ServiceResult<int> DeleteEmployee(string empId);
+        ServiceResult<string> GenerateNewId(string firstName, string lastName);
     }
 }

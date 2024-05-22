@@ -1,5 +1,6 @@
 ﻿using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
+using EmployeeDirectory.Services;
 
 namespace EmployeeDirectory.Controllers
 {
@@ -14,42 +15,42 @@ namespace EmployeeDirectory.Controllers
 
         public List<Role> ViewRoles()
         {
-            return roleService.GetAllRoles();
+            return roleService.GetAllRoles().DataList;
         }
         public int Add(Role role)
         {
-            return roleService.Add(role);
+            return roleService.Add(role).Data;
         }
         public bool DoesRoleExists(string roleName, string location)
         {
-            return roleService.DoesRoleExists(roleName, location);
+            return roleService.DoesRoleExists(roleName, location).Data;
         }
         public string GenerateRoleId()
         {
-            return roleService.GenerateRoleId();
+            return roleService.GenerateRoleId().Data;
         }
 
         public List<Tuple<string, string, string>> GetRoleNames()
         {   
             
-            return roleService.GetRoleNames();
+            return roleService.GetRoleNames().Data;
         }
 
         public List<string> GetAllDepartments()
         {
-            return roleService.GetAllDepartments();
+            return roleService.GetAllDepartments().Data;
         }
 
         public List<string> GetAllRoleNamesByDepartment(string department)
         {
 
-            return roleService.GetAllRoleNamesByDepartment(department);
+            return roleService.GetAllRoleNamesByDepartment(department).Data;
         }
 
         public List<string> GetAllLocationByDepartmentAndRoleNames(string roleName)
         {
 
-            return roleService.GetAllLocationByDepartmentAndRoleNames(roleName);
+            return roleService.GetAllLocationByDepartmentAndRoleNames(roleName).Data;
         }
     }
 }

@@ -5,6 +5,7 @@ using EmployeeDirectory.Interfaces;
 using AutoMapper;
 using EmployeeDirectory.Models.Models;
 using EmployeeDirectory.Services.Services;
+using EmployeeDirectory.Services;
 namespace EmployeeDirectory.UI.Controllers
 {
     public class EmployeeController : IEmployeeController
@@ -21,7 +22,7 @@ namespace EmployeeDirectory.UI.Controllers
 
         public string GetNewEmployeeId(string firstName, string lastName)
         {
-            return employeeService.GenerateNewId(firstName,lastName);
+            return employeeService.GenerateNewId(firstName, lastName).Data;
         }
 
         public Mapper GetEmployeeViewMapper()
@@ -50,9 +51,9 @@ namespace EmployeeDirectory.UI.Controllers
         {
 
             Mapper mapper = GetEmployeeViewMapper();
-            List<Employee> employees = employeeService.GetEmployees();
-            List<Role> roles = roleService.GetAllRoles();
-            List<Project> projects = projectService.GetProjects();
+            List<Employee> employees = employeeService.GetEmployees().DataList;
+            List<Role> roles = roleService.GetAllRoles().DataList;
+            List<Project> projects = projectService.GetProjects().DataList;
 
             //List<EmployeeView> employeesToView = employees.Join(roles, emp => emp.RoleId, role => role.Id, (employee, role) =>
             //{
@@ -83,7 +84,7 @@ namespace EmployeeDirectory.UI.Controllers
         {
             Mapper mapper = GetEmployeeViewMapper();
 
-            Employee? employee = employeeService.GetEmployeeById(empId);
+            Employee? employee = employeeService.GetEmployeeById(empId).Data;
 
             EmployeeView? employeeToView = new EmployeeView();
             if (employee == null)
@@ -93,8 +94,8 @@ namespace EmployeeDirectory.UI.Controllers
             else
             {   
 
-                Project? project = projectService.GetProjectById(employee.ProjectId);
-                Role role = roleService.GetRoleById(employee.RoleId!);
+                Project? project = projectService.GetProjectById(employee.ProjectId).Data;
+                Role role = roleService.GetRoleById(employee.RoleId!).Data;
                 if (role == null)
                 {
                     return null;
@@ -121,23 +122,22 @@ namespace EmployeeDirectory.UI.Controllers
 
         public Employee? GetEmployeeById(string id)
         {
-            return employeeService.GetEmployeeById(id);
+            return employeeService.GetEmployeeById(id).Data;
         }
 
-        public Employee? AddEmployee(Employee employee)
+        public int AddEmployee(Employee employee)
         {
-            return employeeService.AddEmployee(employee);
+            return employeeService.AddEmployee(employee).Data;
         }
 
         public int EditEmployee(Employee employee)
         {
-            return employeeService.UpdateEmployee(employee);
+            return employeeService.UpdateEmployee(employee).Data;
         }
 
         public int DeleteEmployee(string empId)
         {
-            return employeeService.DeleteEmployee(empId);
+            return employeeService.DeleteEmployee(empId).Data;
         }
-
     }
 }
