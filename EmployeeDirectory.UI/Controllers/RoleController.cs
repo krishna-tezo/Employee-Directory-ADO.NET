@@ -1,56 +1,58 @@
 ﻿using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
 using EmployeeDirectory.Services;
+using System;
+using System.Collections.Generic;
 
 namespace EmployeeDirectory.Controllers
 {
     public class RoleController : IRoleController
     {
-        private IRoleService roleService;
+        private readonly IRoleService roleService;
 
         public RoleController(IRoleService roleService)
         {
             this.roleService = roleService;
         }
 
-        public List<Role> ViewRoles()
+        public ServiceResult<Role> ViewRoles()
         {
-            return roleService.GetAllRoles().DataList;
-        }
-        public int Add(Role role)
-        {
-            return roleService.Add(role).Data;
-        }
-        public bool DoesRoleExists(string roleName, string location)
-        {
-            return roleService.DoesRoleExists(roleName, location).Data;
-        }
-        public string GenerateRoleId()
-        {
-            return roleService.GenerateRoleId().Data;
+            return roleService.GetAllRoles();
         }
 
-        public List<Tuple<string, string, string>> GetRoleNames()
-        {   
-            
-            return roleService.GetRoleNames().Data;
+        public ServiceResult<int> Add(Role role)
+        {
+            return roleService.Add(role);
         }
 
-        public List<string> GetAllDepartments()
+        public ServiceResult<bool> DoesRoleExists(string roleName, string location)
         {
-            return roleService.GetAllDepartments().Data;
+            return roleService.DoesRoleExists(roleName, location);
         }
 
-        public List<string> GetAllRoleNamesByDepartment(string department)
+        public ServiceResult<string> GenerateRoleId()
         {
-
-            return roleService.GetAllRoleNamesByDepartment(department).Data;
+            return roleService.GenerateRoleId();
         }
 
-        public List<string> GetAllLocationByDepartmentAndRoleNames(string roleName)
+        public ServiceResult<List<Tuple<string, string, string>>> GetRoleNames()
         {
+            return roleService.GetRoleNames();
+        }
 
-            return roleService.GetAllLocationByDepartmentAndRoleNames(roleName).Data;
+        public ServiceResult<List<string>> GetAllDepartments()
+        {
+            return roleService.GetAllDepartments();
+        }
+
+        public ServiceResult<List<string>> GetAllRoleNamesByDepartment(string department)
+        {
+            return roleService.GetAllRoleNamesByDepartment(department);
+        }
+
+        public ServiceResult<List<string>> GetAllLocationByDepartmentAndRoleNames(string roleName)
+        {
+            return roleService.GetAllLocationByDepartmentAndRoleNames(roleName);
         }
     }
 }

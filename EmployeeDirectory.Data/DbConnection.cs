@@ -17,7 +17,7 @@ namespace EmployeeDirectory.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw new Exception("Error establishing connection");
             }
             return connection;
         }

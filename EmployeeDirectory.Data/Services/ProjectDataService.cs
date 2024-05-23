@@ -13,15 +13,15 @@ namespace EmployeeDirectory.Data.Services
         {
             this.commonDataService = commonDataService;
         }
-        private Project MapProject(SqlDataReader reader)
-        {
-            return new Project
-            {
-                Id = reader["Id"].ToString(),
-                Name = reader["Name"].ToString(),
-                ManagerName = reader["ManagerName"].ToString()
-            };
-        }
+        //private Project MapProject(SqlDataReader reader)
+        //{
+        //    return new Project
+        //    {
+        //        Id = reader["Id"].ToString(),
+        //        Name = reader["Name"].ToString(),
+        //        ManagerName = reader["ManagerName"].ToString()
+        //    };
+        //}
         public List<Project> GetProjects()
         {
             string query = "SELECT P.Id," +
@@ -30,7 +30,7 @@ namespace EmployeeDirectory.Data.Services
                     "FROM Project P " +
                     "JOIN Manager M ON P.ManagerId = M.Id " +
                     "JOIN Employee E ON M.EmpId = E.Id ";
-            return commonDataService.GetData(query, MapProject);
+            return commonDataService.GetData(query, commonDataService.MapObject<Project>);
         }
         
 
@@ -44,7 +44,7 @@ namespace EmployeeDirectory.Data.Services
                     "JOIN Employee E ON M.EmpId = E.Id " +
                     "WHERE P.Id = @id";
 
-            return commonDataService.GetSingleData(query, id, MapProject);
+            return commonDataService.GetSingleData(query, id, commonDataService.MapObject<Project>);
         }
     }
 }

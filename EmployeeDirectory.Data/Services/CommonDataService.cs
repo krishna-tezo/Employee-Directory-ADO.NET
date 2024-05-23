@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Globalization;
 
 namespace EmployeeDirectory.Data.Services
 {
@@ -9,6 +10,8 @@ namespace EmployeeDirectory.Data.Services
         {
             this.dbConnection = dbConnection;
         }
+
+        //Get All Data
         public List<T> GetData<T>(string query, Func<SqlDataReader, T> mapFunction)
         {
             List<T> data = new List<T>();
@@ -48,6 +51,43 @@ namespace EmployeeDirectory.Data.Services
                 }
             }
             return data;
+        }
+
+
+        public T MapObject<T>(SqlDataReader reader) where T : new()
+        {
+            T obj = new();
+            var properties = typeof(T).GetProperties();
+
+            foreach (var prop in properties)
+            {
+                if (reader[prop.Name] == DBNull.Value)
+                    continue;
+
+                object value = reader[prop.Name];
+                var propType = prop.PropertyType;
+
+                if (propType == typeof(DateTime) && DateTime.TryParseExact(value.ToString(), "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateValue))
+                {
+                    prop.SetValue(obj, dateValue);
+                }
+                else if (propType == typeof(bool))
+                {
+                    if (value.ToString() == "1")
+                    {
+                        prop.SetValue(obj, true);
+                    }
+                    else if(value.ToString() == "0")
+                    {
+                        prop.SetValue(obj, false);
+                    }
+                }
+                else
+                {
+                    prop.SetValue(obj, Convert.ChangeType(value, propType));
+                }
+            }
+            return obj;
         }
     }
 }

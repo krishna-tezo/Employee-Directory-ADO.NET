@@ -13,36 +13,24 @@ namespace EmployeeDirectory.Data.Services
             this.commonDataServices = commonDataServices;
         }
 
-        private Role MapRole(SqlDataReader reader)
-        {
-            return new Role
-            {
-                Id = reader["Id"].ToString(),
-                Name = reader["Name"].ToString(),
-                Department = reader["DeptName"].ToString(),
-                Description = reader["Description"].ToString(),
-                Location = reader["LocationName"].ToString()
-            };
-        }
-
         public List<Role> GetRoles()
         {
             string query = "SELECT " +
-                           "R.Id, R.Name, R.Description, D.Name as DeptName, L.Name as LocationName " +
+                           "R.Id, R.Name, R.Description, D.Name as Department, L.Name as Location " +
                            "FROM Role R " +
                            "JOIN Department D ON R.DeptId = D.Id " +
-                           "JOIN Location L On R.LocationId = L.Id ";
-            return commonDataServices.GetData(query, MapRole);
+                           "JOIN Location L On R.LocationId = L.Id ORDER BY Department";
+            return commonDataServices.GetData(query, commonDataServices.MapObject<Role>);
         }
         public Role GetRoleById(string id)
         {
             string query = "SELECT " +
-                                "R.Id,R.Name,R.Description, D.Name as DeptName, L.Name as LocationName " +
+                                "R.Id,R.Name,R.Description, D.Name as Department, L.Name as Location " +
                                 "FROM Role R " +
                                 "JOIN Department D ON R.DeptId = D.Id " +
                                 "JOIN Location L On R.LocationId = L.Id " +
                                 "WHERE R.Id = @Id";
-            return commonDataServices.GetSingleData(query,id,MapRole);
+            return commonDataServices.GetSingleData(query, id, commonDataServices.MapObject<Role>);
         }
 
         public int Add(Role role, string departmentId, string locationId)
@@ -94,43 +82,38 @@ namespace EmployeeDirectory.Data.Services
 
         public string GetLocationId(string locationName)
         {
-            try
+
+            using (SqlConnection conn = dbConnection.GetConnection())
             {
-                using (SqlConnection conn = dbConnection.GetConnection())
+                conn.Open();
+                string query = "SELECT Id FROM Location WHERE Name = @LocationName";
+
+                using (SqlCommand command = new SqlCommand(query, conn))
                 {
-                    conn.Open();
-                    string query = "SELECT Id FROM Location WHERE Name = @LocationName";
-
-                    using (SqlCommand command = new SqlCommand(query, conn))
+                    command.Parameters.AddWithValue("@LocationName", locationName);
+                    var result = command.ExecuteScalar();
+                    if (result != null)
                     {
-                        command.Parameters.AddWithValue("@LocationName", locationName);
-                        var result = command.ExecuteScalar();
-                        if (result != null)
-                        {
-                            return result.ToString();
-                        }
+                        return result.ToString();
                     }
-
-                    // If the location does not exist, get the maximum LocationId
-                    query = "SELECT MAX(Id) FROM Location";
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        string? result = cmd.ExecuteScalar()?.ToString();
-                        if (result != null)
-                        {
-                            string newId = GenerateNewLocationId(result);
-                            InsertLocation(newId, locationName);
-                            return newId;
-                        }
-                    }
-
-                    conn.Close();
                 }
+
+                //If location doens't exist
+                query = "SELECT MAX(Id) FROM Location";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    string? result = cmd.ExecuteScalar()?.ToString();
+                    if (result != null)
+                    {
+                        string newId = GenerateNewLocationId(result);
+                        InsertLocation(newId, locationName);
+                        return newId;
+                    }
+                }
+
+                conn.Close();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+
             return "LOC001";
         }
 

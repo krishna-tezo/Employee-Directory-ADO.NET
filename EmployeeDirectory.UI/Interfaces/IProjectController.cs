@@ -1,10 +1,11 @@
-﻿using EmployeeDirectory.Models.Models;
+﻿using EmployeeDirectory.Models;
+using EmployeeDirectory.Models.Models;
 
 namespace EmployeeDirectory.UI.Interfaces
 {
     public interface IProjectController
     {
-        List<Tuple<string, string, string>> GetProjectNames();
-        List<Project> ViewProjects();
+        ServiceResult<List<Tuple<string, string, string>>> GetProjectNames();
+        ServiceResult<Project> ViewProjects();
     }
 }

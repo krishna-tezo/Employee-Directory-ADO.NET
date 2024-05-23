@@ -27,7 +27,7 @@ namespace EmployeeDirectory.Services
             }
             catch (Exception ex)
             {
-                return ServiceResult<Employee>.Fail(ex.Message);
+                return ServiceResult<Employee>.Fail("Database Issue:"+ex.Message);
             }
         }
 
@@ -38,13 +38,13 @@ namespace EmployeeDirectory.Services
                 Employee employee = employeeDataService.GetEmployeeById(id);
                 if(employee == null)
                 {
-                    return ServiceResult<Employee>.Fail("Employee doesn't exist");
+                    return ServiceResult<Employee>.Fail($"Employee Id {id} doesn't exist");
                 }
                 return ServiceResult<Employee>.Success(employee);
             }
             catch(Exception ex)
             {
-                return ServiceResult<Employee>.Fail(ex.Message);
+                return ServiceResult<Employee>.Fail("Database Issue:"+ex.Message);
             }
         }
         
@@ -55,15 +55,14 @@ namespace EmployeeDirectory.Services
                 int rowsAffected = employeeDataService.AddEmployee(employee);
                 if(rowsAffected == 0)
                 {
-                    return ServiceResult<int>.Fail("Something went wrong");
+                    return ServiceResult<int>.Fail("Database Connectivity Issue");
                 }
                 return ServiceResult<int>.Success(rowsAffected,$"{rowsAffected} data has been inserted");
             }
             catch(Exception ex)
             {
-                return ServiceResult<int>.Fail(ex.Message);
+                return ServiceResult<int>.Fail("Database Issue:"+ex.Message);
             }
-
         }
 
         public ServiceResult<int> DeleteEmployee(string empId)
@@ -73,13 +72,13 @@ namespace EmployeeDirectory.Services
                 int rowsAffected = employeeDataService.DeleteEmployee(empId);
                 if (rowsAffected == 0)
                 {
-                    return ServiceResult<int>.Fail("Something went wrong");
+                    return ServiceResult<int>.Fail("Id doesn't exist");
                 }
                 return ServiceResult<int>.Success(rowsAffected,$"{rowsAffected} employee has been deleted");
             }
             catch(Exception ex)
             {
-                return ServiceResult<int>.Fail(ex.Message);
+                return ServiceResult<int>.Fail("Database Issue:"+ex.Message);
             }
         }
 
@@ -90,7 +89,7 @@ namespace EmployeeDirectory.Services
                 Employee? existingEmployee = employees.Find((emp) => emp.Id == newEmployee.Id);
                 if(existingEmployee != null)
                 {
-                    int rowsAffected = employeeDataService.UpdateEmployee(existingEmployee);
+                    int rowsAffected = employeeDataService.UpdateEmployee(newEmployee);
                     return ServiceResult<int>.Success(rowsAffected,$"{rowsAffected} employee has been updated");
                 }
                 else
@@ -100,7 +99,7 @@ namespace EmployeeDirectory.Services
             }
             catch(Exception ex)
             {
-                return ServiceResult<int>.Fail(ex.Message);
+                return ServiceResult<int>.Fail("Database Issue:"+ex.Message);
             }
         }
         public ServiceResult<string> GenerateNewId(string firstName, string lastName)

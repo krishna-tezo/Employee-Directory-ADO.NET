@@ -16,8 +16,8 @@
 
         public override string ToString()
         {
-            //TODO: use string interpolation
-            return "EmpId: " + Id + ", Name: " + FirstName + " " + LastName + ", RoleId: " + RoleId;
+            return $"EmpId: {Id} , Name: {FirstName} {LastName} , RoleId: {RoleId}";
         }
+        
     }
 }

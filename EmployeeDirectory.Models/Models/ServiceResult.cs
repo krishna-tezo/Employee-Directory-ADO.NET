@@ -29,14 +29,7 @@
                 Data = data
             };
         }
-        public static ServiceResult<T> Success(string? message)
-        {
-            return new ServiceResult<T>
-            {
-                IsOperationSuccess = true,
-                Message = message,
-            };
-        }
+        
 
         public static ServiceResult<T> Fail(string message)
         {

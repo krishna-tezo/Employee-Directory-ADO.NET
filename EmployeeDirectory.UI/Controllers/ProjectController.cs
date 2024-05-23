@@ -1,29 +1,28 @@
-﻿using EmployeeDirectory.Models.Models;
+﻿using EmployeeDirectory.Models;
+using EmployeeDirectory.Models.Models;
 using EmployeeDirectory.Services.Services;
 using EmployeeDirectory.UI.Interfaces;
+
 
 namespace EmployeeDirectory.UI.Controllers
 {
     public class ProjectController : IProjectController
     {
-        private IProjectService projectService;
+        private readonly IProjectService projectService;
 
         public ProjectController(IProjectService projectService)
         {
             this.projectService = projectService;
         }
 
-        public List<Project> ViewProjects()
+        public ServiceResult<Project> ViewProjects()
         {
-            return projectService.GetProjects().DataList;
+            return projectService.GetProjects();
         }
 
-
-        public List<Tuple<string, string, string>> GetProjectNames()
+        public ServiceResult<List<Tuple<string, string, string>>> GetProjectNames()
         {
-            return projectService.GetProjectNames().Data;
+            return projectService.GetProjectNames();
         }
-
-
     }
 }

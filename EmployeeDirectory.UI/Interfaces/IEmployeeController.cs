@@ -1,16 +1,16 @@
 ﻿using EmployeeDirectory.Models;
 using EmployeeDirectory.ViewModel;
-namespace EmployeeDirectory.UI.Interfaces
+
+namespace EmployeeDirectory.UI.Controllers
 {
     public interface IEmployeeController
     {
-        List<EmployeeView> ViewEmployees();
-        EmployeeView? ViewEmployee(string empId);
-        string GetNewEmployeeId(string firstName, string lastName);
-        int AddEmployee(Employee employee);
-        int EditEmployee(Employee employee);
-        int DeleteEmployee(string empId);
-        
-        Employee? GetEmployeeById(string empId);
+        ServiceResult<int> AddEmployee(Employee employee);
+        ServiceResult<int> DeleteEmployee(string empId);
+        ServiceResult<int> EditEmployee(Employee employee);
+        ServiceResult<Employee> GetEmployeeById(string id);
+        ServiceResult<string> GetNewEmployeeId(string firstName, string lastName);
+        ServiceResult<EmployeeView> ViewEmployee(string empId);
+        ServiceResult<EmployeeView> ViewEmployees();
     }
 }

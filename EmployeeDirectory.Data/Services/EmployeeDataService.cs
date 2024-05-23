@@ -3,6 +3,7 @@ using EmployeeDirectory.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Globalization;
+using System.Reflection;
 
 
 namespace EmployeeDirectory.Data.Services
@@ -17,40 +18,17 @@ namespace EmployeeDirectory.Data.Services
             this.commonDataServices = commonDataServices;
         }
 
-        private Employee MapEmployee(SqlDataReader reader)
-        {
-            DateTime dob = DateTime.ParseExact(reader["DOB"].ToString(), "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-            DateTime joinDate = DateTime.ParseExact(reader["JoinDate"].ToString(), "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-            bool isDeleted = reader["IsDeleted"].ToString() == "1";
-
-            return new Employee
-            {
-                Id = reader["Id"].ToString(),
-                FirstName = reader["FirstName"].ToString(),
-                LastName = reader["LastName"].ToString(),
-                Email = reader["Email"].ToString(),
-                DOB = dob,
-                MobileNumber = reader["MobileNumber"].ToString(),
-                JoinDate = joinDate,
-                ProjectId = reader["ProjectId"].ToString(),
-                RoleId = reader["RoleId"].ToString(),
-                IsDeleted = isDeleted
-            };
-        }
-
         public List<Employee> GetEmployees()
         {
             string query = "SELECT * FROM Employee WHERE IsDeleted != '1'";
-            return commonDataServices.GetData(query, MapEmployee);
+            return commonDataServices.GetData(query, commonDataServices.MapObject<Employee>);
         }
 
         public Employee GetEmployeeById(string id)
         {
             string query = $"SELECT * FROM EMPLOYEE WHERE ID = @id";
-            return commonDataServices.GetSingleData(query, id, MapEmployee);
+            return commonDataServices.GetSingleData(query, id, commonDataServices.MapObject<Employee>);
         }
-
-
 
         public int AddEmployee(Employee employee)
         {

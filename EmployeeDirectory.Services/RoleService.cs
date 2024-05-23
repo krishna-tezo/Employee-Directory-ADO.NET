@@ -55,7 +55,10 @@ namespace EmployeeDirectory.Services
                 string locationId = roleDataService.GetLocationId(role.Location);
 
                 int rowsAffected = roleDataService.Add(role, departmentId, locationId);
-                return ServiceResult<int>.Success(rowsAffected, $"{rowsAffected} data has been inserted");
+                if(rowsAffected == 0) {
+                    return ServiceResult<int>.Fail("The role couldn't be added");
+                }
+                return ServiceResult<int>.Success(rowsAffected, $"{rowsAffected} role has been inserted");
             }
             catch (Exception ex)
             {
@@ -69,6 +72,7 @@ namespace EmployeeDirectory.Services
             {
                 List<Role> roles = GetAllRoles().DataList;
                 bool exists = roles.Any(role => role.Name.Equals(roleName) && role.Location.Equals(location));
+
                 return ServiceResult<bool>.Success(exists);
             }
             catch (Exception ex)
