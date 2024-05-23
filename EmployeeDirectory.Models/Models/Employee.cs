@@ -9,9 +9,9 @@
         public DateTime DOB { get; set; }
         public string? MobileNumber { get; set; }
         public DateTime JoinDate { get; set; }
-        public string? ProjectId {  get; set; }
+        public string ProjectId {  get; set; }
  
-        public string? RoleId { get; set; }
+        public string RoleId { get; set; }
         public bool IsDeleted { get; set; }
 
         public override string ToString()

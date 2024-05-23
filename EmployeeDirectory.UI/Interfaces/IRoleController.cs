@@ -1,16 +1,15 @@
 ﻿using EmployeeDirectory.Models;
+using EmployeeDirectory.UI.ViewModels;
 
 namespace EmployeeDirectory.Controllers
 {
     public interface IRoleController
     {
-        ServiceResult<int> Add(Role role);
-        ServiceResult<bool> DoesRoleExists(string roleName, string location);
+        ServiceResult<int> Add(RoleView role);
+        ServiceResult<bool> DoesRoleExists(string roleName, string locationName);
         ServiceResult<string> GenerateRoleId();
         ServiceResult<List<string>> GetAllDepartments();
-        ServiceResult<List<string>> GetAllLocationByDepartmentAndRoleNames(string roleName);
-        ServiceResult<List<string>> GetAllRoleNamesByDepartment(string department);
-        ServiceResult<List<Tuple<string, string, string>>> GetRoleNames();
-        ServiceResult<Role> ViewRoles();
+        public ServiceResult<List<Tuple<string, string, string>>> GetRoleNamesWithLocation();
+        ServiceResult<RoleView> ViewRoles();
     }
 }

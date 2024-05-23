@@ -37,21 +37,15 @@ namespace EmployeeDirectory.Core
             {
                 throw new Exception("Error");
             }
-            services.AddSingleton<IEmployeeDataService, EmployeeDataService>();
-            services.AddSingleton<IRoleDataService, RoleDataService>();
-            services.AddSingleton<IProjectDataService, ProjectDataService>();
             services.AddSingleton<ICommonDataService , CommonDataService>();
-
-            services.AddSingleton<IEmployeeService, EmployeeService>();
-            services.AddSingleton<IRoleService, RoleService>();
-            services.AddSingleton<IProjectService, ProjectService>();
+            services.AddSingleton<IDataServiceManager, DataServiceManager>();
+            services.AddSingleton<ICommonServices, CommonServices>();
             services.AddSingleton<IUIService, UIService>();
             services.AddSingleton<IEmployeeMenu, EmployeeMenu>();
             services.AddSingleton<IRoleMenu, RoleMenu>();
             services.AddSingleton<IValidator, Validator>();
             services.AddSingleton<IEmployeeController, EmployeeController>();
             services.AddSingleton<IRoleController, RoleController>();
-            services.AddSingleton<IProjectController, ProjectController>();
             services.AddSingleton<MainMenu>();
             
 

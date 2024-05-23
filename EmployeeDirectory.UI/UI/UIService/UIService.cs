@@ -3,8 +3,8 @@ using EmployeeDirectory.Core;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
 using EmployeeDirectory.Models.Models;
-using EmployeeDirectory.UI.Controllers;
 using EmployeeDirectory.UI.Interfaces;
+using EmployeeDirectory.UI.ViewModels;
 using EmployeeDirectory.ViewModel;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
@@ -17,14 +17,12 @@ namespace EmployeeDirectory.UI.UIServices
 
         private readonly IRoleController roleController;
         private readonly IEmployeeController employeeController;
-        private readonly IProjectController projectController;
         private readonly IValidator validator;
 
-        public UIService(IEmployeeController employeeController, IRoleController roleController, IValidator validator, IProjectController projectController)
+        public UIService(IEmployeeController employeeController, IRoleController roleController, IValidator validator)
         {
             this.roleController = roleController;
             this.employeeController = employeeController;
-            this.projectController = projectController;
             this.validator = validator;
         }
 
@@ -210,13 +208,13 @@ namespace EmployeeDirectory.UI.UIServices
             while (true);
 
             string? roleId = GetRoleOptions();
-            Tuple<string, string> projectDetails = GetProjectOptions();
-
+            string? projectId = GetProjectOptions();
+            
 
 
             if (formType == EmployeeFormType.Add)
             {
-                empId = employeeController.GetNewEmployeeId(firstName, lastName).Data;
+                empId = employeeController.GetNewEmployeeId().Data;
             }
 
             employee.Id = empId;
@@ -227,7 +225,7 @@ namespace EmployeeDirectory.UI.UIServices
             employee.MobileNumber = mobileNumber;
             employee.JoinDate = joinDate;
             employee.RoleId = roleId;
-            employee.ProjectId = projectDetails.Item1;
+            employee.ProjectId = projectId;
             employee.IsDeleted = false;
 
 
@@ -241,7 +239,7 @@ namespace EmployeeDirectory.UI.UIServices
             int number = 1;
             List<Tuple<string, string, string>> options = new List<Tuple<string, string, string>>();
             Console.WriteLine("\n\n----Available Roles----\n");
-            options = roleController.GetRoleNames().Data;
+            options = roleController.GetRoleNamesWithLocation().Data;
 
             Dictionary<string, string> optionsMap = [];
             Console.WriteLine("-----------------------------------------------------------");
@@ -265,17 +263,17 @@ namespace EmployeeDirectory.UI.UIServices
         }
 
         // Get Project Options
-        public Tuple<string, string> GetProjectOptions()
+        public string GetProjectOptions()
         {
 
             string? inputKey;
             int number = 1;
-            List<Tuple<string, string, string>> options = new List<Tuple<string, string, string>>();
+            List<Tuple<string, string>> options = new List<Tuple<string, string>>();
             Console.WriteLine("\n\n----Available Projects----\n");
-            var result = projectController.GetProjectNames();
+            var result = employeeController.GetProjectNames();
             if (result.IsOperationSuccess)
             {
-                options = projectController.GetProjectNames().Data;
+                options = employeeController.GetProjectNames().Data;
             }
             else
             {
@@ -297,9 +295,7 @@ namespace EmployeeDirectory.UI.UIServices
                 Console.WriteLine("Please Enter a valid option");
                 GetRoleOptions();
             }
-            return optionsMap[inputKey!];
-
-
+            return optionsMap[inputKey].Item1;
         }
         //Get Employee Role Details From Roles Data
         public string GetDepartmentsOption()
@@ -420,6 +416,13 @@ namespace EmployeeDirectory.UI.UIServices
 
         #region "Roles Service"
 
+        public void ViewAllRoles()
+        {
+            List<RoleView> roles = roleController.ViewRoles().DataList;
+
+            ShowRolesDataInTabularFormat(roles);
+        }
+
         //Get New Role Details From Console
         public void AddRole()
         {
@@ -459,7 +462,9 @@ namespace EmployeeDirectory.UI.UIServices
 
             } while (true);
 
-            Role role = new()
+
+
+            RoleView role = new()
             {
                 Id = roleId,
                 Name = roleName,
@@ -473,17 +478,12 @@ namespace EmployeeDirectory.UI.UIServices
         }
         public bool DoesRoleExist(string roleId)
         {
-            List<Role> roles = roleController.ViewRoles().DataList;
+            List<RoleView> roles = roleController.ViewRoles().DataList;
             return roles.Any(role => role.Id == roleId);
         }
 
-        public void ViewAllRoles()
-        {
-            List<Role> roles = roleController.ViewRoles().DataList;
-
-            ShowRolesDataInTabularFormat(roles);
-        }
-        public void ShowRolesDataInTabularFormat(List<Role> roles)
+        
+        public void ShowRolesDataInTabularFormat(List<RoleView> roles)
         {
             Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------");
             string headers = String.Format("|{0,30}|{1,30}|{2,20}|{3,50}|", "RoleName", "Department", "Location", "Description");

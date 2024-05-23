@@ -1,156 +1,31 @@
-﻿using EmployeeDirectory.Data.Data.Services;
-using EmployeeDirectory.Models;
-using Microsoft.Data.SqlClient;
-namespace EmployeeDirectory.Data.Services
-{
-    public class RoleDataService : IRoleDataService
-    {
-        private IDbConnection dbConnection;
-        private ICommonDataService commonDataServices;
-        public RoleDataService(IDbConnection dbConnection, ICommonDataService commonDataServices)
-        {
-            this.dbConnection = dbConnection;
-            this.commonDataServices = commonDataServices;
-        }
+﻿//using EmployeeDirectory.Data.Data.Services;
+//namespace EmployeeDirectory.Data.Services
+//{
+//    public class RoleDataService : IRoleDataService
+//    {
+//        private IDbConnection dbConnection;
+//        private ICommonDataService commonDataServices;
+//        public RoleDataService(IDbConnection dbConnection, ICommonDataService commonDataServices)
+//        {
+//            this.dbConnection = dbConnection;
+//            this.commonDataServices = commonDataServices;
+//        }
 
-        public List<Role> GetRoles()
-        {
-            string query = "SELECT " +
-                           "R.Id, R.Name, R.Description, D.Name as Department, L.Name as Location " +
-                           "FROM Role R " +
-                           "JOIN Department D ON R.DeptId = D.Id " +
-                           "JOIN Location L On R.LocationId = L.Id ORDER BY Department";
-            return commonDataServices.GetData(query, commonDataServices.MapObject<Role>);
-        }
-        public Role GetRoleById(string id)
-        {
-            string query = "SELECT " +
-                                "R.Id,R.Name,R.Description, D.Name as Department, L.Name as Location " +
-                                "FROM Role R " +
-                                "JOIN Department D ON R.DeptId = D.Id " +
-                                "JOIN Location L On R.LocationId = L.Id " +
-                                "WHERE R.Id = @Id";
-            return commonDataServices.GetSingleData(query, id, commonDataServices.MapObject<Role>);
-        }
+//        public string GenerateNewLocationId(string lastLocId)
+//        {
+//            string prefix = "LOC";
+//            string numericPart = lastLocId.Substring(prefix.Length);
 
-        public int Add(Role role, string departmentId, string locationId)
-        {
-            int rowsAffected = 0;
-            using (SqlConnection conn = dbConnection.GetConnection())
-            {
-                string query = "INSERT INTO Role Values( " +
-                    "@RoleId, @RoleName, @DepartmentId, @Description, @LocationId)";
+//            if (int.TryParse(numericPart, out int numericId))
+//            {
+//                int newNumericId = numericId + 1;
+//                return prefix + newNumericId.ToString("D3");
+//            }
+//            else
+//            {
+//                throw new ArgumentException("Invalid location ID format.");
+//            }
+//        }
 
-                using (SqlCommand command = new SqlCommand(query, conn))
-                {
-                    command.Parameters.AddWithValue("@RoleId", role.Id);
-                    command.Parameters.AddWithValue("@RoleName", role.Name);
-                    command.Parameters.AddWithValue("@DepartmentId", departmentId);
-                    command.Parameters.AddWithValue("@LocationId", locationId);
-                    command.Parameters.AddWithValue("@Description", role.Description);
-
-                    conn.Open();
-                    rowsAffected = command.ExecuteNonQuery();
-                    conn.Close();
-                }
-            }
-            return rowsAffected;
-        }
-
-        public string GetDepartmentId(string departmentName)
-        {
-            string id = null;
-            try
-            {
-                string query = "SELECT Id FROM Department WHERE Name = @DeptName";
-
-                using (SqlConnection conn = dbConnection.GetConnection())
-                using (SqlCommand command = new SqlCommand(query, conn))
-                {
-                    command.Parameters.AddWithValue("@DeptName", departmentName);
-                    conn.Open();
-                    id = command.ExecuteScalar()?.ToString();
-                    conn.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return id;
-        }
-
-        public string GetLocationId(string locationName)
-        {
-
-            using (SqlConnection conn = dbConnection.GetConnection())
-            {
-                conn.Open();
-                string query = "SELECT Id FROM Location WHERE Name = @LocationName";
-
-                using (SqlCommand command = new SqlCommand(query, conn))
-                {
-                    command.Parameters.AddWithValue("@LocationName", locationName);
-                    var result = command.ExecuteScalar();
-                    if (result != null)
-                    {
-                        return result.ToString();
-                    }
-                }
-
-                //If location doens't exist
-                query = "SELECT MAX(Id) FROM Location";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    string? result = cmd.ExecuteScalar()?.ToString();
-                    if (result != null)
-                    {
-                        string newId = GenerateNewLocationId(result);
-                        InsertLocation(newId, locationName);
-                        return newId;
-                    }
-                }
-
-                conn.Close();
-            }
-
-            return "LOC001";
-        }
-
-        public string GenerateNewLocationId(string lastLocId)
-        {
-            string prefix = "LOC";
-            string numericPart = lastLocId.Substring(prefix.Length);
-
-            if (int.TryParse(numericPart, out int numericId))
-            {
-                int newNumericId = numericId + 1;
-                return prefix + newNumericId.ToString("D3");
-            }
-            else
-            {
-                throw new ArgumentException("Invalid location ID format.");
-            }
-        }
-
-        public int InsertLocation(string newLocationId, string newLocationName)
-        {
-            using (SqlConnection conn = dbConnection.GetConnection())
-            {
-                string insertQuery = "INSERT INTO Location (Id, Name) VALUES (@LocationId, @LocationName)";
-                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
-                {
-                    insertCmd.Parameters.AddWithValue("@LocationId", newLocationId);
-                    insertCmd.Parameters.AddWithValue("@LocationName", newLocationName);
-
-                    conn.Open();
-                    int rowsAffected = insertCmd.ExecuteNonQuery();
-                    conn.Close();
-                    return rowsAffected;
-                }
-            }
-        }
-    }
-
-
-}
+//    }
+//}

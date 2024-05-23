@@ -1,9 +1,8 @@
 ﻿namespace EmployeeDirectory.Models.Models
 {
-    public class Project
+    public class Manager
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public string ManagerId { get; set; }
     }
 }

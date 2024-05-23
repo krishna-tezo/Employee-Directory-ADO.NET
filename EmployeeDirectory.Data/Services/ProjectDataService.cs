@@ -30,7 +30,7 @@ namespace EmployeeDirectory.Data.Services
                     "FROM Project P " +
                     "JOIN Manager M ON P.ManagerId = M.Id " +
                     "JOIN Employee E ON M.EmpId = E.Id ";
-            return commonDataService.GetData(query, commonDataService.MapObject<Project>);
+            return commonDataService.GetAll(query, commonDataService.MapObject<Project>);
         }
         
 
@@ -44,7 +44,7 @@ namespace EmployeeDirectory.Data.Services
                     "JOIN Employee E ON M.EmpId = E.Id " +
                     "WHERE P.Id = @id";
 
-            return commonDataService.GetSingleData(query, id, commonDataService.MapObject<Project>);
+            return commonDataService.Get(query, id, commonDataService.MapObject<Project>);
         }
     }
 }
