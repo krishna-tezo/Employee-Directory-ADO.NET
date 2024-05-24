@@ -7,5 +7,6 @@ namespace EmployeeDirectory.Data.Data.Services
     {
         EmployeeSummary GetEmployeeSummaryById(string id);
         List<EmployeeSummary> GetEmployeesSummary();
+        int DeleteEmployee(string id);
     }
 }

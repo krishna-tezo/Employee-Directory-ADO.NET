@@ -71,8 +71,6 @@ namespace EmployeeDirectory.Data.Services
             }
         }
 
-
-
         //Delete
         public int DeleteById<T>(string query, string Id)
         {
@@ -153,6 +151,7 @@ namespace EmployeeDirectory.Data.Services
 
                 using (SqlCommand cmd = new(query, conn))
                 {
+                    cmd.Parameters.AddWithValue("@Name", name);
                     result = cmd.ExecuteScalar().ToString();
                 }
                 conn.Close();

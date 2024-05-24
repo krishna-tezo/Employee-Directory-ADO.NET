@@ -5,7 +5,7 @@ namespace EmployeeDirectory.Data.Data.Services
 {
     public interface IRoleDataService
     {
-        public RoleSummary GetRolesSummaryById(string id);
         public List<RoleSummary> GetRolesSummary();
+        public RoleSummary GetRoleSummaryById(string id);
     }
 }

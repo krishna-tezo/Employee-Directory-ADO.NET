@@ -2,17 +2,22 @@
 using EmployeeDirectory.ViewModel;
 using EmployeeDirectory.Models.Models;
 using EmployeeDirectory.Services;
+using EmployeeDirectory.Data.SummaryModels;
 using EmployeeDirectory.UI.Interfaces;
 namespace EmployeeDirectory.UI.Controllers
 {
     public class EmployeeController : IEmployeeController
     {
-
-
         ICommonServices commonServices;
-        public EmployeeController(ICommonServices commonServices)
+        IEmployeeService employeeService;
+        ICommonController commonController;
+       
+
+        public EmployeeController(ICommonServices commonServices, IEmployeeService employeeService, ICommonController commonController)
         {
             this.commonServices = commonServices;
+            this.employeeService = employeeService;
+            this.commonController = commonController;
         }
 
         public ServiceResult<string> GetNewEmployeeId()
@@ -24,110 +29,47 @@ namespace EmployeeDirectory.UI.Controllers
             }
             return ServiceResult<string>.Success(empId);
         }
-        public ServiceResult<EmployeeView> EmployeeViewMapper(List<Employee> employees, List<Role> roles, List<Project> projects, List<Department> departments, List<Manager> managers, List<Location> locations)
+
+        public ServiceResult<EmployeeView> ViewEmployees()
         {
-            //Manager name and id
-            var empManagers = managers.Join(employees,
-                                manager => manager.EmpId,
-                                employee => employee.Id,
-                                (manager, employee) => new
-                                {
-                                    Id = employee.Id,
-                                    Name = $"{employee.FirstName} {employee.LastName}"
-                                });
+            var employees = employeeService.GetEmployees();
 
-            List<EmployeeView> employeesToView = employees
-            .Join(roles, emp => emp.RoleId, role => role.Id, (emp, role) => new { Employee = emp, Role = role })
-            .Join(projects, empRole => empRole.Employee.ProjectId, project => project.Id, (empRole, project) => new { empRole.Employee, empRole.Role, Project = project })
-            .Join(departments, empRoleProj => empRoleProj.Role?.DepartmentId, department => department.Id, (empRoleProj, department) => new { empRoleProj.Employee, empRoleProj.Role, empRoleProj.Project, Department = department })
-            .Join(managers, empRoleProjDep => empRoleProjDep.Project?.ManagerId, manager => manager.Id, (empRoleProjDep, manager) => new { empRoleProjDep.Employee, empRoleProjDep.Role, empRoleProjDep.Project, empRoleProjDep.Department, Manager = manager })
-            .Join(locations, empRoleProjDepMan => empRoleProjDepMan.Role?.LocationId, location => location.Id, (empRoleProjDepMan, location) => new EmployeeView
+            if (!employees.IsOperationSuccess)
             {
-                Id = empRoleProjDepMan.Employee.Id,
-                Name = $"{empRoleProjDepMan.Employee.FirstName} {empRoleProjDepMan.Employee.LastName}",
-                Role = empRoleProjDepMan.Role?.Name,
-                Department = empRoleProjDepMan.Department?.Name,
-                Location = location?.Name,
-                JoinDate = empRoleProjDepMan.Employee.JoinDate,
-                ManagerName = empManagers.FirstOrDefault(emp => emp.Id == empRoleProjDepMan.Manager.Id).Name,
-                ProjectName = empRoleProjDepMan.Project?.Name
-            }).ToList();
+                return ServiceResult<EmployeeView>.Fail($"{employees.Message}");
+            }
 
-            if (employeesToView != null)
+            List<EmployeeSummary> employeesSummary = employees.DataList;
+            List<EmployeeView> employeesToView = new List<EmployeeView>();
+
+            foreach (EmployeeSummary employee in employeesSummary)
+            {
+                employeesToView.Add(commonController.Map<EmployeeSummary,EmployeeView>(employee).Data);
+            }
+
+            if (employeesToView.Count > 0)
             {
                 return ServiceResult<EmployeeView>.Success(employeesToView);
             }
             else
             {
-                return ServiceResult<EmployeeView>.Fail("Error Occurred while joining");
+                return ServiceResult<EmployeeView>.Fail("No Employee To Show");
             }
-        }
-
-        public ServiceResult<EmployeeView> ViewEmployees()
-        {
-            var employeeResult = commonServices.GetAll<Employee>();
-            var roleResult = commonServices.GetAll<Role>();
-            var projectResult = commonServices.GetAll<Project>();
-            var departmentResult = commonServices.GetAll<Department>();
-            var managerResult = commonServices.GetAll<Manager>();
-            var locationresult = commonServices.GetAll<Location>();
-
-            if (!employeeResult.IsOperationSuccess || !roleResult.IsOperationSuccess || !projectResult.IsOperationSuccess || !departmentResult.IsOperationSuccess || !managerResult.IsOperationSuccess || !locationresult.IsOperationSuccess)
-            {
-
-                var errorMessages = new List<string>
-                {
-                    employeeResult.Message,
-                    roleResult.Message,
-                    projectResult.Message,
-                    departmentResult.Message,
-                    managerResult.Message,
-                    locationresult.Message,
-                }.Where(m => m != null).ToList();
-
-                return ServiceResult<EmployeeView>.Fail(string.Join("; ", errorMessages));
-            }
-
-            List<Employee> employees = employeeResult.DataList;
-            List<Role> roles = roleResult.DataList;
-            List<Project> projects = projectResult.DataList;
-            List<Department> departments = departmentResult.DataList;
-            List<Manager> managers = managerResult.DataList;
-            List<Location> locations = locationresult.DataList;
-
-            return EmployeeViewMapper(employees, roles, projects, departments, managers, locations);
         }
 
         public ServiceResult<EmployeeView> ViewEmployee(string empId)
         {
-            Employee employee = commonServices.Get<Employee>(empId).Data;
-            Role role = commonServices.Get<Role>(employee.RoleId).Data;
-            Project project = commonServices.Get<Project>(employee.ProjectId).Data;
-            Department department = commonServices.Get<Department>(role.DepartmentId).Data;
-            Manager manager = commonServices.Get<Manager>(project.ManagerId).Data;
-            Location location = commonServices.Get<Location>(role.LocationId).Data;
-
-            Employee managerEmp = commonServices.Get<Employee>(manager.EmpId).Data;
-
             EmployeeView employeeToView = new EmployeeView();
 
-            if (employee == null || role == null || project == null || department == null || manager == null || location == null)
+            EmployeeSummary employeeSummary = employeeService.GetEmployee(empId).Data;
+
+            if (employeeSummary == null)
             {
                 return ServiceResult<EmployeeView>.Fail("Data not found");
             }
             else
             {
-                employeeToView = new EmployeeView
-                {
-                    Id = employee.Id,
-                    Name = $"{employee.FirstName} {employee.LastName}",
-                    Role = role.Name,
-                    Department = department.Name,
-                    Location = location.Name,
-                    JoinDate = employee.JoinDate,
-                    ManagerName = $"{managerEmp.FirstName} {managerEmp.LastName}",
-                    ProjectName = project.Name
-                };
+                employeeToView = commonController.Map<EmployeeSummary, EmployeeView>(employeeSummary).Data;
             }
             return ServiceResult<EmployeeView>.Success(employeeToView);
         }
@@ -149,7 +91,7 @@ namespace EmployeeDirectory.UI.Controllers
 
         public ServiceResult<int> DeleteEmployee(string empId)
         {
-            return commonServices.Delete<Employee>(empId);
+            return employeeService.Delete(empId);
         }
 
         public ServiceResult<List<Tuple<string, string>>> GetProjectNames()

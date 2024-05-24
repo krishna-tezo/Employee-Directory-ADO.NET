@@ -3,7 +3,7 @@ using EmployeeDirectory.Core;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.Models;
 using EmployeeDirectory.Models.Models;
-using EmployeeDirectory.UI.Interfaces;
+using EmployeeDirectory.UI.Controllers;
 using EmployeeDirectory.UI.ViewModels;
 using EmployeeDirectory.ViewModel;
 using Microsoft.IdentityModel.Tokens;

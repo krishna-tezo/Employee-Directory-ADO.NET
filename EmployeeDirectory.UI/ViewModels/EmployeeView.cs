@@ -15,7 +15,7 @@
 
         public override string ToString()
         {
-            return "EmpId: " + Id + ", Name: " + Name;
+            return $"EmpId:{Id}, Name: {Name}";
         }
     }
 }

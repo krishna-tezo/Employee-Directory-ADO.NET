@@ -20,7 +20,7 @@ namespace EmployeeDirectory.Data.Services
             return commonDataServices.GetAll(query, commonDataServices.MapObject<RoleSummary>);
         }
 
-        public RoleSummary GetRolesSummaryById(string id)
+        public RoleSummary GetRoleSummaryById(string id)
         {
             string query = "SELECT R.Id,R.Name,R.DepartmentId,D.Name as Department, R.LocationId, L.Name as Location, " +
                 "R.Description FROM Role R " +

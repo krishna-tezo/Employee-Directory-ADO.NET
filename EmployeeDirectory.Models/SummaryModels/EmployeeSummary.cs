@@ -9,16 +9,17 @@
         public DateTime DOB { get; set; }
         public string MobileNumber { get; set; }
         public DateTime JoinDate { get; set; }
-        public int ProjectId { get; set; }
+        public string ProjectId { get; set; }
         public string ProjectName { get; set; }
-        public int RoleId { get; set; }
+        public string RoleId { get; set; }
         public string Role { get; set; }
-        public int DepartmentId { get; set; }
+        public string DepartmentId { get; set; }
         public string Department { get; set; }
-        public int LocationId { get; set; }
+        public string LocationId { get; set; }
         public string Location { get; set; }
-        public int ManagerId { get; set; }
+        public string ManagerId { get; set; }
         public string ManagerName { get; set; }
+        public bool IsDeleted { get; set; }
     }
 
 }

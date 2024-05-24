@@ -1,7 +1,11 @@
-﻿using EmployeeDirectory.Models;
+﻿using EmployeeDirectory.Data.SummaryModels;
+using EmployeeDirectory.Models;
 using EmployeeDirectory.Models.Models;
+using EmployeeDirectory.Models.SummaryModels;
 using EmployeeDirectory.Services;
+using EmployeeDirectory.UI.Interfaces;
 using EmployeeDirectory.UI.ViewModels;
+
 using System.Data;
 
 namespace EmployeeDirectory.Controllers
@@ -9,34 +13,28 @@ namespace EmployeeDirectory.Controllers
     public class RoleController : IRoleController
     {
         private readonly ICommonServices commonServices;
+        private readonly IRoleService roleService;
+        private readonly ICommonController commonController;
 
-        public RoleController(ICommonServices commonServices)
+        public RoleController(ICommonServices commonServices, IRoleService roleService, ICommonController commonController)
         {
             this.commonServices = commonServices;
+            this.roleService = roleService;
+            this.commonController = commonController;
         }
 
         //View All Roles
         public ServiceResult<RoleView> ViewRoles()
         {
 
-            List<Role> roles = commonServices.GetAll<Role>().DataList;
-            List<Department> departments = commonServices.GetAll<Department>().DataList;
-            List<Location> locations = commonServices.GetAll<Location>().DataList;
-
-            var rolesToView = roles
-                .Join(departments, role => role.DepartmentId, department => department.Id, (role, department) => new { Role = role, Department = department })
-                .Join(locations, rd => rd.Role.LocationId, location => location.Id, (rd, location) => new RoleView
-                {
-                    Id = rd.Role.Id,
-                    Name = rd.Role.Name,
-                    Department = rd.Department.Name,
-                    Description = rd.Role.Description,
-                    Location = location.Name
-                })
-                .ToList();
-
+            List<RoleSummary> roles = roleService.GetRoles().DataList;
+            List<RoleView> rolesToView = new List<RoleView>();
             if (roles != null)
             {
+                foreach (RoleSummary role in roles)
+                {
+                    rolesToView.Add(commonController.Map<RoleSummary, RoleView>(role).Data);
+                }
                 return ServiceResult<RoleView>.Success(rolesToView);
             }
             else
@@ -49,53 +47,19 @@ namespace EmployeeDirectory.Controllers
         public ServiceResult<int> Add(RoleView viewRole)
         {
             Role role = new Role();
+            RoleSummary roleSummary = new RoleSummary
+            {
+                Id = viewRole.Id,
+                Name = viewRole.Name,
+                Description = viewRole.Description,
+                Department = viewRole.Department,
+                Location = viewRole.Location,
+
+            };
+            return roleService.Add(roleSummary);
             
-            string departmentId = commonServices.GetIdFromName<Department>(viewRole.Department).Data;
-            if (departmentId == null)
-            {
-                departmentId = commonServices.GenerateNewId<Department>().Data;
-            }
-
-            string locationId = commonServices.GetIdFromName<Location>(viewRole.Location).Data;
-            if (locationId == null)
-            {
-                
-                locationId = commonServices.GenerateNewId<Location>().Data;
-                Location location = new Location
-                {
-                    Id = locationId,
-                    Name = viewRole.Location
-                };
-                commonServices.Add(location);
-            }
-            role.Id = viewRole.Id;
-            role.Name = viewRole.Name;
-            role.Description = viewRole.Description;
-            role.LocationId = locationId;
-            role.DepartmentId = departmentId;
-
-            return commonServices.Add(role);
         }
 
-        //Does a role exist with the same name and location
-        public ServiceResult<bool> DoesRoleExists(string roleName, string locationName)
-        {
-            try
-            {
-                List<Role> roles = commonServices.GetAll<Role>().DataList;
-                List<Location> locations = commonServices.GetAll<Location>().DataList;
-
-                var result = roles
-                    .Join(locations, role => role.LocationId, location => location.Id, (role, location) => new { Role = role, Location = location })
-                    .Any(rl => rl.Role.Name == roleName && rl.Location.Name == locationName);
-
-                return ServiceResult<bool>.Success(result);
-            }
-            catch (Exception ex)
-            {
-                return ServiceResult<bool>.Fail("Database Issue: " + ex.Message);
-            }
-        }
 
         //Generate a new Role Id
         public ServiceResult<string> GenerateRoleId()
@@ -124,7 +88,15 @@ namespace EmployeeDirectory.Controllers
             }
         }
 
-        
+        //Does a role exist with the same name and location
+        public ServiceResult<bool> DoesRoleExists(string roleName, string locationName)
+        {
+            bool roleExists = roleService.DoesRoleExists(roleName, locationName).Data;
+
+            return ServiceResult<bool>.Success(roleExists);
+
+        }
+
         public ServiceResult<List<string>> GetAllDepartments()
         {
             try
