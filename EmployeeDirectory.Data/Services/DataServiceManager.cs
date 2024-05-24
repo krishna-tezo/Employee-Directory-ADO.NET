@@ -1,7 +1,4 @@
-﻿using EmployeeDirectory.Models;
-using System.Linq.Expressions;
-
-namespace EmployeeDirectory.Data.Services
+﻿namespace EmployeeDirectory.Data.Services
 {
     public class DataServiceManager : IDataServiceManager
     {

@@ -1,6 +1,5 @@
 ﻿using EmployeeDirectory.Data.Services;
 using EmployeeDirectory.Models;
-using Newtonsoft.Json.Linq;
 
 namespace EmployeeDirectory.Services
 {

@@ -26,6 +26,16 @@ namespace EmployeeDirectory.UI.Controllers
         }
         public ServiceResult<EmployeeView> EmployeeViewMapper(List<Employee> employees, List<Role> roles, List<Project> projects, List<Department> departments, List<Manager> managers, List<Location> locations)
         {
+            //Manager name and id
+            var empManagers = managers.Join(employees,
+                                manager => manager.EmpId,
+                                employee => employee.Id,
+                                (manager, employee) => new
+                                {
+                                    Id = employee.Id,
+                                    Name = $"{employee.FirstName} {employee.LastName}"
+                                });
+
             List<EmployeeView> employeesToView = employees
             .Join(roles, emp => emp.RoleId, role => role.Id, (emp, role) => new { Employee = emp, Role = role })
             .Join(projects, empRole => empRole.Employee.ProjectId, project => project.Id, (empRole, project) => new { empRole.Employee, empRole.Role, Project = project })
@@ -39,7 +49,7 @@ namespace EmployeeDirectory.UI.Controllers
                 Department = empRoleProjDepMan.Department?.Name,
                 Location = location?.Name,
                 JoinDate = empRoleProjDepMan.Employee.JoinDate,
-                ManagerName = empRoleProjDepMan.Manager?.Name,
+                ManagerName = empManagers.FirstOrDefault(emp => emp.Id == empRoleProjDepMan.Manager.Id).Name,
                 ProjectName = empRoleProjDepMan.Project?.Name
             }).ToList();
 
@@ -62,7 +72,7 @@ namespace EmployeeDirectory.UI.Controllers
             var managerResult = commonServices.GetAll<Manager>();
             var locationresult = commonServices.GetAll<Location>();
 
-            if (!employeeResult.IsOperationSuccess || !roleResult.IsOperationSuccess || !projectResult.IsOperationSuccess || !departmentResult.IsOperationSuccess || !managerResult.IsOperationSuccess || locationresult.IsOperationSuccess)
+            if (!employeeResult.IsOperationSuccess || !roleResult.IsOperationSuccess || !projectResult.IsOperationSuccess || !departmentResult.IsOperationSuccess || !managerResult.IsOperationSuccess || !locationresult.IsOperationSuccess)
             {
 
                 var errorMessages = new List<string>
@@ -97,12 +107,15 @@ namespace EmployeeDirectory.UI.Controllers
             Manager manager = commonServices.Get<Manager>(project.ManagerId).Data;
             Location location = commonServices.Get<Location>(role.LocationId).Data;
 
+            Employee managerEmp = commonServices.Get<Employee>(manager.EmpId).Data;
+
             EmployeeView employeeToView = new EmployeeView();
 
             if (employee == null || role == null || project == null || department == null || manager == null || location == null)
             {
                 return ServiceResult<EmployeeView>.Fail("Data not found");
             }
+            else
             {
                 employeeToView = new EmployeeView
                 {
@@ -112,7 +125,7 @@ namespace EmployeeDirectory.UI.Controllers
                     Department = department.Name,
                     Location = location.Name,
                     JoinDate = employee.JoinDate,
-                    ManagerName = manager.Name,
+                    ManagerName = $"{managerEmp.FirstName} {managerEmp.LastName}",
                     ProjectName = project.Name
                 };
             }

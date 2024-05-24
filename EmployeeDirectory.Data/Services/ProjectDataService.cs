@@ -1,8 +1,5 @@
 ﻿using EmployeeDirectory.Data.Data.Services;
-using EmployeeDirectory.Models;
 using EmployeeDirectory.Models.Models;
-using Microsoft.Data.SqlClient;
-using System.Data;
 
 namespace EmployeeDirectory.Data.Services
 {
@@ -13,6 +10,7 @@ namespace EmployeeDirectory.Data.Services
         {
             this.commonDataService = commonDataService;
         }
+
         //private Project MapProject(SqlDataReader reader)
         //{
         //    return new Project
@@ -22,6 +20,7 @@ namespace EmployeeDirectory.Data.Services
         //        ManagerName = reader["ManagerName"].ToString()
         //    };
         //}
+
         public List<Project> GetProjects()
         {
             string query = "SELECT P.Id," +

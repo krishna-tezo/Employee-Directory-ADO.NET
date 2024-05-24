@@ -1,31 +1,33 @@
-﻿//using EmployeeDirectory.Data.Data.Services;
-//namespace EmployeeDirectory.Data.Services
-//{
-//    public class RoleDataService : IRoleDataService
-//    {
-//        private IDbConnection dbConnection;
-//        private ICommonDataService commonDataServices;
-//        public RoleDataService(IDbConnection dbConnection, ICommonDataService commonDataServices)
-//        {
-//            this.dbConnection = dbConnection;
-//            this.commonDataServices = commonDataServices;
-//        }
+﻿using EmployeeDirectory.Data.Data.Services;
+using EmployeeDirectory.Models.SummaryModels;
+namespace EmployeeDirectory.Data.Services
+{
+    public class RoleDataService : IRoleDataService
+    {
+        private ICommonDataService commonDataServices;
+        public RoleDataService(ICommonDataService commonDataServices)
+        {
+            this.commonDataServices = commonDataServices;
+        }
+        
+        public List<RoleSummary> GetRolesSummary()
+        {
+            string query = "SELECT R.Id,R.Name,R.DepartmentId,D.Name as Department, R.LocationId, L.Name as Location, " +
+                "R.Description FROM Role R " +
+                "JOIN Department D ON D.Id = R.DepartmentId " +
+                "JOIN Location L ON L.Id = R.LocationId";
 
-//        public string GenerateNewLocationId(string lastLocId)
-//        {
-//            string prefix = "LOC";
-//            string numericPart = lastLocId.Substring(prefix.Length);
+            return commonDataServices.GetAll(query, commonDataServices.MapObject<RoleSummary>);
+        }
 
-//            if (int.TryParse(numericPart, out int numericId))
-//            {
-//                int newNumericId = numericId + 1;
-//                return prefix + newNumericId.ToString("D3");
-//            }
-//            else
-//            {
-//                throw new ArgumentException("Invalid location ID format.");
-//            }
-//        }
+        public RoleSummary GetRolesSummaryById(string id)
+        {
+            string query = "SELECT R.Id,R.Name,R.DepartmentId,D.Name as Department, R.LocationId, L.Name as Location, " +
+                "R.Description FROM Role R " +
+                "JOIN Department D ON D.Id = R.DepartmentId " +
+                "JOIN Location L ON L.Id = R.LocationId WHERE Id = @Id";
 
-//    }
-//}
+            return commonDataServices.Get(query,id, commonDataServices.MapObject<RoleSummary>);
+        }
+    }
+}
